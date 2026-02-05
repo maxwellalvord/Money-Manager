@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import Header from "./_componets/Header";
 
 export default function Home() {
   return (
     <div>
-      <h2>Money Manager</h2>
-      <Button>Start now!</Button>
+      <Header/>
     </div>
   );
 }
