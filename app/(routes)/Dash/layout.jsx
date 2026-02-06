@@ -1,3 +1,4 @@
+
 import React from 'react'
 import SideNav from './_components/SideNav'
 import DashvboardHeader from './_components/DashboardHeader'
@@ -8,7 +9,7 @@ function Dashlayout({children}) {
         <div className='fixed md:w-64 hidden md:block'>
             <SideNav />
         </div>
-        <div className='md:ml-64 bg-green-200'>
+        <div className='md:ml-64 '>
             <DashvboardHeader />
             {children}
         </div>
