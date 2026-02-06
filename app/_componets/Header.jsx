@@ -1,16 +1,26 @@
+"use client"
 import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import React from 'react'
+import { useUser, UserButton } from '@clerk/nextjs'
+import Link from 'next/link'
 
 function Header() {
+
+  const { user, isSignedIn } = useUser();
   return (
-    <div className='p-5 flex justify-between items-center border shadow-xl'>
+    <div className='p-5 flex justify-between items-center'>
         <Image src={'./logo.svg'} 
         alt='logo'
         width={160}
         height={100}
         />
-        <Button>Start Tracking!</Button>
+        {isSignedIn?
+          <UserButton /> : 
+          <Link href={'/sign-in'}>
+            <Button>Start Tracking!</Button>
+          </Link>
+        }
     </div>
   )
 }

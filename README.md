@@ -27,6 +27,7 @@ Tailwind CSS
 HyperUI
 Shadcn
 Clerk
+Lucide
 
 ## Learn More
 
