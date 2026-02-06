@@ -28,6 +28,8 @@ HyperUI
 Shadcn
 Clerk
 Lucide
+Drizzle ORM
+Neon
 
 ## Learn More
 
