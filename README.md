@@ -30,6 +30,7 @@ Clerk
 Lucide
 Drizzle ORM
 Neon
+Emoji Picker React
 
 ## Learn More
 

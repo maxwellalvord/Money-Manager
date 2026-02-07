@@ -2,6 +2,7 @@
 import { Geist, Geist_Mono, Rubik} from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Toaster } from "@/components/ui/sonner"
 
 
 const rubik = Rubik({
@@ -22,6 +23,7 @@ export default function RootLayout({ children }) {
         <body
           className={`${rubik.variable} ${geistMono.variable} antialiased`}
         >
+          <Toaster />
           {children}
         </body>
       </html>

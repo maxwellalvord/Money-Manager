@@ -52,7 +52,7 @@ function SideNav() {
                 {menuList.map((menu, index) => {
                     const Icon = menu.icon;
                     return (
-                        <Link href={menu.path}>
+                        <Link key={menu.id} href={menu.path}>
                         <h2 key={menu.id} className={`flex gap-2 items-center text-gray-500 font-medium mb-2 p-5 rounded-md hover:text-primary hover:bg-blue-100
                             ${path==menu.path && "bg-blue-100 text-primary"}
                             `}>
