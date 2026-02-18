@@ -1,7 +1,7 @@
 "use client"
 import React, { useEffect } from 'react'
 import SideNav from './_components/SideNav'
-import DashvboardHeader from './_components/DashboardHeader'
+import DashboardHeader from './_components/DashboardHeader'
 import { db } from '@/utils/dbConfig'
 import { Budgets } from '@/utils/schema'
 import { useUser } from '@clerk/nextjs'
@@ -22,7 +22,6 @@ function Dashlayout({children}) {
     .from(Budgets)
     .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
 
-    console.log(result);
     if(result.length === 0){
       router.replace('/Dash/budgets');
     }
@@ -33,7 +32,7 @@ function Dashlayout({children}) {
             <SideNav />
         </div>
         <div className='md:ml-64 '>
-            <DashvboardHeader />
+            <DashboardHeader />
             {children}
         </div>
         </div>

@@ -3,8 +3,10 @@
 import React, { useState } from 'react'
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -26,9 +28,12 @@ function CreateBudget() {
   const [amount, setAmount] = useState("");
 
   const {user} = useUser();
+
+  // Create Budget function
   const onCreateBudget = async() => {
     const result = await db.insert(Budgets)
-    .values({
+    .values
+    ({
       name: name,
       amount: amount,
       createdBy: user?.primaryEmailAddress?.emailAddress,
@@ -85,14 +90,19 @@ function CreateBudget() {
                     onChange={(e) => setAmount(e.target.value)}
                     />
                   </div>
-                  <Button
+                 
+                </div>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="sm:justify-start">
+              <DialogClose asChild>
+                 <Button
                     disabled={!(name && amount)}
                     onClick={()=>onCreateBudget()}
                     className='mt-5 w-full'> Create Budget
                   </Button>
-                </div>
-              </DialogDescription>
-            </DialogHeader>
+              </DialogClose>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
     </div>
