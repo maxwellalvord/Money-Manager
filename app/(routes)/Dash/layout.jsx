@@ -14,13 +14,15 @@ function Dashlayout({children}) {
   const router = useRouter();
 
   useEffect(() => {
-    user&&checkUserBudgets();
+    if (user.isLoaded && user.user) {
+      checkUserBudgets();
+    }
   }, [user])
 
   const checkUserBudgets = async() => {
     const result = await db.select()
     .from(Budgets)
-    .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
+    .where(eq(Budgets.createdBy, user.user.primaryEmailAddress.emailAddress))
 
     if(result.length === 0){
       router.replace('/Dash/budgets');
