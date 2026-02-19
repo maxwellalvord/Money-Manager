@@ -19,7 +19,7 @@ import { Budgets } from '@/utils/schema'
 import { useUser } from '@clerk/nextjs'
 import { toast } from 'sonner'
 
-function CreateBudget() {
+function CreateBudget({refreshData}) {
 
   const [emojiIcon, setEmojiIcon] = useState("😀");
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
@@ -42,6 +42,7 @@ function CreateBudget() {
 
     if(result)
       {
+        refreshData()
         toast('New Budget Created!')
       }
   }
@@ -50,7 +51,7 @@ function CreateBudget() {
     <div>
        
         <Dialog>
-          <DialogTrigger> 
+          <DialogTrigger className='w-full'> 
             <div className='bg-slate-100 p-10 rounded-md items-center flex flex-col border-2 border-dashed cursor-pointer hover:shadow-md'>
               <h2 className='text-3xl'>+</h2>
               <h2>Create New Budget</h2>
@@ -67,7 +68,7 @@ function CreateBudget() {
                     onClick={() => setOpenEmojiPicker(!openEmojiPicker)}>
                     {emojiIcon}
                   </Button>
-                  <div className='absolute'>
+                  <div className='absolute z-20'>
                     <EmojiPicker 
                     open={openEmojiPicker}
                     onEmojiClick={(e)=>{

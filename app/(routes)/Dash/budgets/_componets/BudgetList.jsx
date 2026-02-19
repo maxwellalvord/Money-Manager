@@ -32,10 +32,15 @@ function BudgetList() {
   return (
     <div className='mt-7'>
         <div className='grid grid-col-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
-            <CreateBudget />
-            {budgetList.map((budget)=>(
-              <BudgetItem budget = {budget}/>
-            ))}
+            <CreateBudget 
+            refreshData={()=>getBudgetList()}/>
+            {budgetList?.length>0? budgetList.map((budget)=>(
+              <BudgetItem key={budget.id} budget = {budget}/>
+            ))
+          :[1,2,3,4,5,6].map((item, i)=>(
+            <div key={i} className='bg-slate-100 p-5 rounded-lg animate-pulse h-[145px]'>
+            </div>
+          ))}
         </div>
 
     </div>
