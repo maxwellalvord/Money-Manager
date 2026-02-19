@@ -38,7 +38,7 @@ function CreateBudget({refreshData}) {
       amount: amount,
       createdBy: user?.primaryEmailAddress?.emailAddress,
       icon: emojiIcon
-    }).returning({intertedID:Budgets.id})
+    }).returning({insertedId:Budgets.id})
 
     if(result)
       {
