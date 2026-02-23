@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Expenses(params) {
+function Expenses() {
   return (
     <div>Expenses</div>
   )
