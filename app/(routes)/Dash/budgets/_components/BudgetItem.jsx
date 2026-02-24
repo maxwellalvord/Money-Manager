@@ -1,9 +1,10 @@
+import Link from 'next/link'
 import React from 'react'
 
 function BudgetItem({budget}) {
 
   return (
-    <div className='p-5 border rounded-lg
+    <Link href={'/Dash/expenses/' + budget?.id} className='p-5 border rounded-lg
     hover:shadow-md cursor-pointer'>
         <div className='flex gap-2 items-center justify-between'>
         <div className='flex gap-2 items-center'>
@@ -28,7 +29,7 @@ function BudgetItem({budget}) {
                 </div>
             </div>
         </div>
-    </div>
+    </Link>
   )
 }
 
