@@ -1,8 +1,27 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input'
+import { db } from '@/utils/dbConfig';
+import { Budgets, Expenses } from '@/utils/schema';
 import React, { useState } from 'react'
+import { toast } from 'sonner';
 
-function AddExpense() {
+function AddExpense({budgetId, user}) {
+
+    const addNewExpense = async () => {
+        const res = await db.insert(Expenses).values({
+            name: name,
+            amount: amount,
+            budgetId: budgetId,
+            createdBy: user.primaryEmailAddress?.emailAddress,
+            createdAt: new Date().toISOString()
+        }).returning({insertedId:Budgets.id});
+
+        console.log(res)
+        if(res)
+        {
+            toast('Expense Added Successfully')
+        }
+    }
 
     const [name, setName] = useState();
     const [amount, setAmount] = useState();
@@ -21,7 +40,7 @@ function AddExpense() {
             onChange={(e) => setAmount(e.target.value)}
             />
         </div>
-        <Button disabled={!(name&&amount)} className="mt-3 w-full">Add New Expense</Button>
+        <Button disabled={!(name&&amount)} onClick={()=>addNewExpense()} className="mt-3 w-full">Add New Expense</Button>
     </div>
   )
 }

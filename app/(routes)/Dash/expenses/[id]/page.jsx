@@ -9,10 +9,10 @@ import AddExpense from '../_components/AddExpense'
 
 function ExpensesScreen({params}) { 
   const {id} = use(params)
-  const user = useUser();
+  const {user} = useUser();
   const [budgetInfo, setbudgetInfo] = useState();
   useEffect(()=>{
-    user?.isSignedIn && getBudgetInfo();
+    user && getBudgetInfo();
   },[user])
   const getBudgetInfo = async() => {
     const result = await db.select({
@@ -38,7 +38,7 @@ function ExpensesScreen({params}) {
         <div className = 'h-[150px] w-full bg-slate-200 rounded-lg animate-pulse'>
         </div>
         }
-        <AddExpense />
+        <AddExpense budgetId={id} user={user}/>
       </div>
     </div>
   )

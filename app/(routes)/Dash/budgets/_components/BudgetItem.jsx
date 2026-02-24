@@ -5,7 +5,7 @@ function BudgetItem({budget}) {
 
   return (
     <Link href={'/Dash/expenses/' + budget?.id} className='p-5 border rounded-lg
-    hover:shadow-md cursor-pointer'>
+    hover:shadow-md cursor-pointer h-[170px]'>
         <div className='flex gap-2 items-center justify-between'>
         <div className='flex gap-2 items-center'>
             <h2 className='text-2xl p-3 px-4 bg-slate-100 rounded-full'>{budget?.icon}</h2>
