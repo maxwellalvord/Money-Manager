@@ -5,7 +5,12 @@ import { Budgets, Expenses } from '@/utils/schema';
 import React, { useState } from 'react'
 import { toast } from 'sonner';
 
-function AddExpense({budgetId, user}) {
+function AddExpense({budget, budgetId, user, refreshData}) {
+
+    // find remaining budget amount
+    const remaining = budget
+        ? Number(budget.amount) - Number(budget.totalSpend || 0)
+        : undefined;
 
     const addNewExpense = async () => {
         const res = await db.insert(Expenses).values({
@@ -15,16 +20,22 @@ function AddExpense({budgetId, user}) {
             createdBy: user.primaryEmailAddress?.emailAddress,
             createdAt: new Date().toISOString()
         }).returning({insertedId:Budgets.id});
-
-        console.log(res)
         if(res)
         {
+            refreshData();
             toast('Expense Added Successfully')
         }
     }
-
+    
     const [name, setName] = useState();
     const [amount, setAmount] = useState();
+
+    // budget to expense comparision to see if we can submit new expense
+    const numericAmount = Number(amount);
+    const isValidAmount = amount && !isNaN(numericAmount) && numericAmount > 0;
+    const amountWithinBudget = remaining === undefined || numericAmount <= remaining;
+    const isDisabled = !(name && isValidAmount && amountWithinBudget);
+
   return (
     <div className= 'border p-5 rounded-lg'>
         <h2 className= 'font-bold text-lg'>Add Expense</h2>
@@ -39,8 +50,13 @@ function AddExpense({budgetId, user}) {
             <Input placeholder='e.g. 65'
             onChange={(e) => setAmount(e.target.value)}
             />
+            {remaining !== undefined && amount && !amountWithinBudget && (
+                <p className="text-sm text-red-500 mt-1">
+                  Amount exceeds remaining budget (${remaining}).
+                </p>
+            )}
         </div>
-        <Button disabled={!(name&&amount)} onClick={()=>addNewExpense()} className="mt-3 w-full">Add New Expense</Button>
+        <Button disabled={isDisabled} onClick={()=>addNewExpense()} className="mt-3 w-full">Add New Expense</Button>
     </div>
   )
 }

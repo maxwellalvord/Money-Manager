@@ -25,7 +25,8 @@ function ExpensesScreen({params}) {
         .where(eq(Budgets.id, id))
         .groupBy(Budgets.id)
         
-        setbudgetInfo(result[0])
+        setbudgetInfo(result[0]);
+
     
   }
   return (
@@ -38,7 +39,12 @@ function ExpensesScreen({params}) {
         <div className = 'h-[150px] w-full bg-slate-200 rounded-lg animate-pulse'>
         </div>
         }
-        <AddExpense budgetId={id} user={user}/>
+        <AddExpense
+          budget={budgetInfo}
+          budgetId={id}
+          user={user}
+          refreshData={()=>getBudgetInfo()}
+        />
       </div>
     </div>
   )
