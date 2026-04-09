@@ -27,7 +27,7 @@ import {
 
 
 function ExpensesScreen({params}) { 
-  const {id} = use(params)
+  const { id } = use(params);
   const {user} = useUser();
   const [budgetInfo, setbudgetInfo] = useState();
   const [expensesList, setExpensesList] = useState([]);
@@ -80,7 +80,11 @@ function ExpensesScreen({params}) {
     <div className='p-8'>
       <h2 className='text-3xl font-bold flex justify-between items-center'>My Expenses
         <div className='flex gap-2 items-center'>
-          <EditBudget/>
+          {budgetInfo ? (
+            <EditBudget budgetInfo={budgetInfo} refreshData={()=>getBudgetInfo()} />
+              ) : (
+                <div className='text-sm'>Loading budget...</div>
+              )}
         </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
