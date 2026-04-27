@@ -35,7 +35,7 @@ function Dash() {
   return (
     <div className='p-8'>
       <div className=''>
-        <h2 className='font-bold text-3xl'>ADD CUSTOM HALVE OVAL STYLE HERE Welcome, {user?.firstName}!</h2>
+        <h2 className='font-bold text-3xl'>ADD CUSTOM HALVE OVAL STYLE HERE Welcome, {user?.firstName || "loading user"}!</h2>
         <p className='text-gray-500'>Check down below for a quick breakdown of your budgets.</p>
       </div>
 

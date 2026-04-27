@@ -15,31 +15,45 @@ function CardInfo({budgetList}) {
             totalBudget_ = totalBudget_ + Number(i.amount);
             totalSpend_ = totalSpend_ + i.totalSpend
         })
-        console.log(totalBudget_, totalSpend_);
+        setTotalBudget(totalBudget_);
+        setTotalSpend(totalSpend_);
     }
   return (
-    <div className='mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
-        <div className='p-7 border rounded-lg flex items-center justify-between'>
-            <div>
-                <h2 className='text-sm font-bold'>Total Budget</h2>
-                <h2 className='font-bold text-2xl'>$1,000</h2>
+    <div>
+    {budgetList?.length > 0 ?  
+        <div className='mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
+            <div className='p-7 border rounded-lg flex items-center justify-between'>
+                <div>
+                    <h2 className='text-sm font-bold'>Total Budget</h2>
+                    <h2 className='font-bold text-2xl'>${totalBudget}</h2>
+                </div>
+                <PiggyBank className='bg-primary p-3 h-12 w-12 rounded-full text-white'/>
             </div>
-            <PiggyBank className='bg-primary p-3 h-12 w-12 rounded-full text-white'/>
-        </div>
-        <div className='p-7 border rounded-lg flex items-center justify-between'>
-            <div>
-                <h2 className='text-sm font-bold'>Total Spent</h2>
-                <h2 className='font-bold text-2xl'>$1,000</h2>
+            <div className='p-7 border rounded-lg flex items-center justify-between'>
+                <div>
+                    <h2 className='text-sm font-bold'>Total Spent</h2>
+                    <h2 className='font-bold text-2xl'>${totalSpend}</h2>
+                </div>
+                <ReceiptText className='bg-primary p-3 h-12 w-12 rounded-full text-white'/>
             </div>
-            <ReceiptText className='bg-primary p-3 h-12 w-12 rounded-full text-white'/>
-        </div>
-        <div className='p-7 border rounded-lg flex items-center justify-between'>
-            <div>
-                <h2 className='text-sm font-bold'># of Budgets</h2>
-                <h2 className='font-bold text-2xl'>$1,000</h2>
+            <div className='p-7 border rounded-lg flex items-center justify-between'>
+                <div>
+                    <h2 className='text-sm font-bold'># of Budgets</h2>
+                    <h2 className='font-bold text-2xl'>{budgetList.length}</h2>
+                </div>
+                <Wallet className='bg-primary p-3 h-12 w-12 rounded-full text-white'/>
             </div>
-            <Wallet className='bg-primary p-3 h-12 w-12 rounded-full text-white'/>
         </div>
+        :
+        <div className='mt-7 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5'>
+            {   [1,2,3].map((item, i)=>(
+                <div className='h-[120px] w-full bg-slate-200 animate-pulse rounded-lg' key={i}>
+                </div>
+
+            ))}
+            
+        </div>
+    }
     </div>
   )
 }
