@@ -31,6 +31,7 @@ Lucide
 Drizzle ORM
 Neon
 Emoji Picker React
+Recharts
 
 ## Learn More
 
