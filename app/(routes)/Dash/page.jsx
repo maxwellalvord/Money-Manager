@@ -7,6 +7,7 @@ import { Budgets, Expenses } from '@/utils/schema';
 import { desc, eq, getTableColumns, sql } from 'drizzle-orm';
 import BarChartDash from './_components/BarChartDash';
 import BudgetItem from './budgets/_components/BudgetItem';
+import ExpenseListTable from './expenses/_components/ExpenseListTable';
 
 function Dash() {
 
@@ -14,6 +15,7 @@ function Dash() {
   
   const [budgetList, setBudgetList] = useState([]);
   const {user} = useUser();
+  const [expensesList, setExpensesList] = useState([]);
   useEffect(()=>{
     user && getBudgetList();
   },[user]) 
@@ -45,7 +47,7 @@ function Dash() {
     .where(eq(Budgets.createdBy,user?.primaryEmailAddress?.emailAddress))
     .orderBy(desc(Expenses.createdAt));
 
-    console.log(res);
+    setExpensesList(res);
   }
 
   return (
@@ -60,6 +62,11 @@ function Dash() {
         <div className='md:col-span-2'>
           <BarChartDash 
           budgetList={budgetList} />
+
+          <ExpenseListTable
+            expensesList={expensesList}
+            refreshData={()=>getBudgetList()}
+          />
         </div>
         <div className='grid gap-4'>
           <h2 className='font-bold text-lg'>Latest Budgets</h2>
