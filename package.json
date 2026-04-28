@@ -29,6 +29,7 @@
     "tailwind-merge": "^3.4.0"
   },
   "devDependencies": {
+    "@recharts/devtools": "^0.0.12",
     "@tailwindcss/postcss": "^4",
     "drizzle-kit": "^0.31.8",
     "eslint": "^9",
