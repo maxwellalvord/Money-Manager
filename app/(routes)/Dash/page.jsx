@@ -28,10 +28,24 @@ function Dash() {
     .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
     .where(eq(Budgets.createdBy, user.primaryEmailAddress?.emailAddress))
     .groupBy(Budgets.id)
-
     .orderBy(desc(Budgets.id))
 
     setBudgetList(result);
+    getAllExpenses();
+  }
+
+  const getAllExpenses=async()=>{
+    const res = await db.select({
+      id: Expenses.id,
+      name: Expenses.name,
+      amount: Expenses.amount,
+      createdAt: Expenses.createdAt,
+    }).from(Budgets)
+    .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+    .where(eq(Budgets.createdBy,user?.primaryEmailAddress?.emailAddress))
+    .orderBy(desc(Expenses.createdAt));
+
+    console.log(res);
   }
 
   return (
