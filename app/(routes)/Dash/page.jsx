@@ -11,41 +11,41 @@ import ExpenseListTable from './expenses/_components/ExpenseListTable';
 
 function Dash() {
 
- 
-  
+
+
   const [budgetList, setBudgetList] = useState([]);
-  const {user} = useUser();
+  const { user } = useUser();
   const [expensesList, setExpensesList] = useState([]);
-  useEffect(()=>{
+  useEffect(() => {
     user && getBudgetList();
-  },[user]) 
-  
+  }, [user])
+
   // join budget and expense table to get budget list
-  const getBudgetList=async()=>{
+  const getBudgetList = async () => {
     const result = await db.select({
       ...getTableColumns(Budgets),
-      totalSpend: sql `sum(${Expenses.amount})`.mapWith(Number),
-      totalItem: sql `count(${Expenses.id})`.mapWith(Number),
+      totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
+      totalItem: sql`count(${Expenses.id})`.mapWith(Number),
     }).from(Budgets)
-    .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-    .where(eq(Budgets.createdBy, user.primaryEmailAddress?.emailAddress))
-    .groupBy(Budgets.id)
-    .orderBy(desc(Budgets.id))
+      .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+      .where(eq(Budgets.createdBy, user.primaryEmailAddress?.emailAddress))
+      .groupBy(Budgets.id)
+      .orderBy(desc(Budgets.id))
 
     setBudgetList(result);
     getAllExpenses();
   }
 
-  const getAllExpenses=async()=>{
+  const getAllExpenses = async () => {
     const res = await db.select({
       id: Expenses.id,
       name: Expenses.name,
       amount: Expenses.amount,
       createdAt: Expenses.createdAt,
     }).from(Budgets)
-    .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-    .where(eq(Budgets.createdBy,user?.primaryEmailAddress?.emailAddress))
-    .orderBy(desc(Expenses.createdAt));
+      .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+      .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
+      .orderBy(desc(Expenses.createdAt));
 
     setExpensesList(res);
   }
@@ -53,24 +53,27 @@ function Dash() {
   return (
     <div className='p-8'>
       <div className=''>
-        <h2 className='font-bold text-3xl'>ADD CUSTOM HALVE OVAL STYLE HERE Welcome, {user?.firstName || "loading user"}!</h2>
-        <p className='text-gray-500'>Check down below for a quick breakdown of your budgets.</p>
+        <h2 className='font-bold text-3xl relative inline-block mb-2'>
+          <span className='relative z-10'>Welcome, {user?.firstName || "loading user"}!</span>
+          <div className='absolute -left-8 -top-4 -bottom-4 -right-8 border-2 border-l-0 border-blue-200 rounded-r-full shadow-lg bg-gradient-to-r from-blue-50 to-transparent'></div>
+        </h2>
+        <p className='ml-8 mt-3 max-w-2xl rounded-2xl bg-blue-50/70 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm'>Check down below for a quick breakdown of your budgets.</p>
       </div>
 
       <CardInfo budgetList={budgetList} />
       <div className='grid grid-cols-1 md:grid-cols-3 mt-7 gap-5'>
         <div className='md:col-span-2'>
-          <BarChartDash 
-          budgetList={budgetList} />
+          <BarChartDash
+            budgetList={budgetList} />
 
           <ExpenseListTable
             expensesList={expensesList}
-            refreshData={()=>getBudgetList()}
+            refreshData={() => getBudgetList()}
           />
         </div>
         <div className='grid gap-4'>
           <h2 className='font-bold text-lg'>Latest Budgets</h2>
-          {budgetList.map((budget, i)=>(
+          {budgetList.map((budget, i) => (
             <BudgetItem budget={budget} key={i} />
           ))}
         </div>

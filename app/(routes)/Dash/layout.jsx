@@ -8,7 +8,7 @@ import { useUser } from '@clerk/nextjs'
 import { eq } from 'drizzle-orm'
 import { useRouter } from 'next/navigation'
 
-function Dashlayout({children}) {
+function Dashlayout({ children }) {
 
   const user = useUser();
   const router = useRouter();
@@ -19,25 +19,25 @@ function Dashlayout({children}) {
     }
   }, [user])
 
-  const checkUserBudgets = async() => {
+  const checkUserBudgets = async () => {
     const result = await db.select()
-    .from(Budgets)
-    .where(eq(Budgets.createdBy, user.user.primaryEmailAddress.emailAddress))
+      .from(Budgets)
+      .where(eq(Budgets.createdBy, user.user.primaryEmailAddress.emailAddress))
 
-    if(result.length === 0){
+    if (result.length === 0) {
       router.replace('/Dash/budgets');
     }
   }
   return (
     <div >
-        <div className='fixed md:w-64 hidden md:block'>
-            <SideNav />
-        </div>
-        <div className='md:ml-64 '>
-            <DashboardHeader />
-            {children}
-        </div>
-        </div>
+      <div className='fixed md:w-64 hidden md:block'>
+        <SideNav />
+      </div>
+      <div className='md:ml-64 '>
+        <DashboardHeader />
+        {children}
+      </div>
+    </div>
   )
 }
 

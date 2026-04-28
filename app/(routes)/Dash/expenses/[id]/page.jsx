@@ -26,54 +26,53 @@ import {
 } from "@/components/ui/alert-dialog"
 
 
-function ExpensesScreen({params}) { 
+function ExpensesScreen({ params }) {
   const { id } = use(params);
-  const {user} = useUser();
+  const { user } = useUser();
   const [budgetInfo, setbudgetInfo] = useState();
   const [expensesList, setExpensesList] = useState([]);
   const route = useRouter();
-  useEffect(()=>{
+  useEffect(() => {
     user && getBudgetInfo();
-  },[user])
-  const getBudgetInfo = async() => {
+  }, [user])
+  const getBudgetInfo = async () => {
     const result = await db.select({
-          ...getTableColumns(Budgets),
-          totalSpend: sql `sum(${Expenses.amount})`.mapWith(Number),
-          totalItem: sql `count(${Expenses.id})`.mapWith(Number),
-        }).from(Budgets)
-        .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-        .where(eq(Budgets.createdBy, user.primaryEmailAddress?.emailAddress))
-        .where(eq(Budgets.id, id))
-        .groupBy(Budgets.id)
-        
-        setbudgetInfo(result[0]);
-        getExpensesList();
+      ...getTableColumns(Budgets),
+      totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
+      totalItem: sql`count(${Expenses.id})`.mapWith(Number),
+    }).from(Budgets)
+      .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
+      .where(eq(Budgets.createdBy, user.primaryEmailAddress?.emailAddress))
+      .where(eq(Budgets.id, id))
+      .groupBy(Budgets.id)
 
-    
+    setbudgetInfo(result[0]);
+    getExpensesList();
+
+
   }
 
-  const getExpensesList = async() => {
+  const getExpensesList = async () => {
     const res = await db.select().from(Expenses).where(eq(Expenses.budgetId, id)).orderBy(desc(Expenses.id));
 
     setExpensesList(res);
 
-    
+
   }
 
-  const deleteBudget = async() => {
+  const deleteBudget = async () => {
 
     const deleteExpenseRes = await db.delete(Expenses).where(eq(Expenses.budgetId, id)).returning();
-    
-    if (deleteExpenseRes)
-    {
-       await db.delete(Budgets).where(eq(Budgets.id, id)).returning();
+
+    if (deleteExpenseRes) {
+      await db.delete(Budgets).where(eq(Budgets.id, id)).returning();
     }
     else {
       toast('Error Deleting Budget!');
     }
     toast('Budget Deleted Successfully!');
     route.replace('/Dash/budgets');
-    
+
 
   }
   return (
@@ -81,10 +80,10 @@ function ExpensesScreen({params}) {
       <h2 className='text-3xl font-bold flex justify-between items-center'>My Expenses
         <div className='flex gap-2 items-center'>
           {budgetInfo ? (
-            <EditBudget budgetInfo={budgetInfo} refreshData={()=>getBudgetInfo()} />
-              ) : (
-                <div className='text-sm'>Loading budget...</div>
-              )}
+            <EditBudget budgetInfo={budgetInfo} refreshData={() => getBudgetInfo()} />
+          ) : (
+            <div className='text-sm'>Loading budget...</div>
+          )}
         </div>
         <AlertDialog>
           <AlertDialogTrigger asChild>
@@ -104,25 +103,25 @@ function ExpensesScreen({params}) {
           </AlertDialogContent>
         </AlertDialog>
 
-        
+
       </h2>
       <div className=' grid grid-cols-1 md:grid-cols-2 mt-5 gap-5'>
-        {budgetInfo? <BudgetItem
-        budget={budgetInfo}
-        />:
-        <div className = 'h-[150px] w-full bg-slate-200 rounded-lg animate-pulse'>
-        </div>
+        {budgetInfo ? <BudgetItem
+          budget={budgetInfo}
+        /> :
+          <div className='h-[150px] w-full bg-slate-200 rounded-lg animate-pulse'>
+          </div>
         }
         <AddExpense
           budget={budgetInfo}
           budgetId={id}
           user={user}
-          refreshData={()=>getBudgetInfo()}
+          refreshData={() => getBudgetInfo()}
         />
       </div>
       <div className='mt-8'>
 
-        <ExpenseListTable expensesList={expensesList} refreshData={()=>getBudgetInfo()}/>
+        <ExpenseListTable expensesList={expensesList} refreshData={() => getBudgetInfo()} />
       </div>
     </div>
   )

@@ -12,28 +12,28 @@ import Link from 'next/link'
 function SideNav() {
     const menuList = [
         {
-            id:1, 
-            name:'Dashboard',
+            id: 1,
+            name: 'Dashboard',
             icon: LayoutDashboard,
-            path:"/Dash"
+            path: "/Dash"
         },
         {
-            id:2, 
-            name:'Budgets',
+            id: 2,
+            name: 'Budgets',
             icon: HandCoins,
-            path:"/Dash/budgets"
+            path: "/Dash/budgets"
         },
         {
-            id:3, 
-            name:'Expenses',
+            id: 3,
+            name: 'Expenses',
             icon: BanknoteArrowDown,
-            path:"/Dash/expenses"
+            path: "/Dash/expenses"
         },
         {
-            id:4, 
-            name:'Donate',
+            id: 4,
+            name: 'Donate',
             icon: HeartHandshake,
-            path:"/Dash/donate"
+            path: "/Dash/donate"
         }
     ]
     const path = usePathname();
@@ -50,20 +50,20 @@ function SideNav() {
                     const Icon = menu.icon;
                     return (
                         <Link key={menu.id} href={menu.path}>
-                        <h2 key={menu.id} className={`flex gap-2 items-center text-gray-500 font-medium mb-2 p-5 rounded-md hover:text-primary hover:bg-blue-100
-                            ${path==menu.path && "bg-blue-100 text-primary"}
+                            <h2 key={menu.id} className={`flex gap-2 items-center text-gray-500 font-medium mb-2 p-5 rounded-md hover:text-primary hover:bg-blue-100
+                            ${path == menu.path && "bg-blue-100 text-primary"}
                             `}>
-                            <Icon />
-                            {menu.name}
-                        </h2>
+                                <Icon />
+                                {menu.name}
+                            </h2>
                         </Link>
                     )
                 })}
             </div>
-                <div className='fixed bottom-10 p-5 flex gap-2 items-center'>
-                    <UserButton />
-                    Profile
-                </div>
+            <div className='fixed bottom-10 p-5 flex gap-2 items-center'>
+                <UserButton />
+                Profile
+            </div>
         </div>
     )
 }

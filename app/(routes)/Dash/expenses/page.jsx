@@ -7,6 +7,7 @@ import { eq, getTableColumns, sql } from 'drizzle-orm'
 import { useUser } from '@clerk/nextjs'
 import { PiggyBank, ReceiptText, TrendingUp } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
+import { useRouter } from 'next/navigation'
 
 const COLORS = ['#534AB7', '#1D9E75', '#BA7517', '#D4537E', '#378ADD', '#639922']
 
@@ -14,6 +15,7 @@ function Expenses() {
   const [expensesList, setExpensesList] = useState([])
   const [budgetList, setBudgetList] = useState([])
   const { user } = useUser()
+  const router = useRouter()
 
   useEffect(() => {
     if (user) {
@@ -58,7 +60,11 @@ function Expenses() {
       className="p-6 flex flex-col gap-5"
       style={{ minHeight: 'calc(100vh - 60px)' }}
     >
-      <h2 className="font-bold text-2xl">My Expenses</h2>
+
+      <div className='flex items-center gap-3'>
+        <h2 className="font-bold text-2xl">My Expenses</h2>
+      </div>
+
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

@@ -10,17 +10,17 @@ function Header() {
   const { user, isSignedIn } = useUser();
   return (
     <div className='p-5 flex justify-between items-center'>
-        <Image src={'./logo.svg'} 
+      <Image src={'./logo.svg'}
         alt='logo'
         width={160}
         height={100}
-        />
-        {isSignedIn?
-          <UserButton /> : 
-          <Link href={'/sign-in'}>
-            <Button>Start Tracking!</Button>
-          </Link>
-        }
+      />
+      {isSignedIn ?
+        <UserButton /> :
+        <Link href={'/sign-in'}>
+          <Button>Start Tracking!</Button>
+        </Link>
+      }
     </div>
   )
 }
