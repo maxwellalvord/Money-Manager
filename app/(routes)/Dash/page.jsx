@@ -6,6 +6,7 @@ import { db } from '@/utils/dbConfig';
 import { Budgets, Expenses } from '@/utils/schema';
 import { desc, eq, getTableColumns, sql } from 'drizzle-orm';
 import BarChartDash from './_components/BarChartDash';
+import BudgetItem from './budgets/_components/BudgetItem';
 
 function Dash() {
 
@@ -41,13 +42,16 @@ function Dash() {
       </div>
 
       <CardInfo budgetList={budgetList} />
-      <div className='grid grid-cols-1 md:grid-cols-3 mt-7'>
+      <div className='grid grid-cols-1 md:grid-cols-3 mt-7 gap-5'>
         <div className='md:col-span-2'>
           <BarChartDash 
           budgetList={budgetList} />
         </div>
-        <div>
-          other content
+        <div className='grid gap-4'>
+          <h2 className='font-bold text-lg'>Latest Budgets</h2>
+          {budgetList.map((budget, i)=>(
+            <BudgetItem budget={budget} key={i} />
+          ))}
         </div>
       </div>
     </div>
