@@ -32,6 +32,7 @@ Drizzle ORM
 Neon
 Emoji Picker React
 Recharts
+React-PayPal-js
 
 ## Learn More
 

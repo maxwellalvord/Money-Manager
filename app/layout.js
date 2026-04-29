@@ -1,5 +1,5 @@
 
-import { Geist, Geist_Mono, Rubik} from "next/font/google";
+import { Geist, Geist_Mono, Rubik } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner"
