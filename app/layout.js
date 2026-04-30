@@ -3,6 +3,7 @@ import { Geist, Geist_Mono, Rubik } from "next/font/google";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Toaster } from "@/components/ui/sonner"
+import { ThemeProvider } from "next-themes";
 
 
 const rubik = Rubik({
@@ -19,14 +20,16 @@ const geistMono = Geist_Mono({
 export default function RootLayout({ children }) {
   return (
     <ClerkProvider>
-      <html lang="en">
+      <html lang="en" suppressHydrationWarning>
         <body
           className={`${rubik.variable} ${geistMono.variable} antialiased`}
         >
+          <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
           <Toaster />
           {children}
-        </body>
-      </html>
-    </ClerkProvider>
+        </ThemeProvider>
+      </body>
+    </html>
+    </ClerkProvider >
   );
 }

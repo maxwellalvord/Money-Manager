@@ -21,7 +21,7 @@ async function getAccessToken() {
 export async function POST(req) {
   const { amount } = await req.json();
 
-  const safeAmount = Math.max(1, Number(amount) || 1).toFixed(2);
+  const safeAmount = Math.max(1, parseFloat(amount) || 1).toFixed(2);
 
   const accessToken = await getAccessToken();
 

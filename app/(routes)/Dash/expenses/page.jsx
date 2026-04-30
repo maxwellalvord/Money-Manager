@@ -68,21 +68,21 @@ function Expenses() {
 
       {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-slate-100 rounded-lg p-5 flex items-center justify-between">
+        <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Total Spent</p>
             <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
           </div>
           <PiggyBank className="bg-primary p-2 h-10 w-10 rounded-full text-white" />
         </div>
-        <div className="bg-slate-100 rounded-lg p-5 flex items-center justify-between">
+        <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">No. of Expenses</p>
             <p className="text-2xl font-bold">{expensesList.length}</p>
           </div>
           <ReceiptText className="bg-primary p-2 h-10 w-10 rounded-full text-white" />
         </div>
-        <div className="bg-slate-100 rounded-lg p-5 flex items-center justify-between">
+        <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Avg per Expense</p>
             <p className="text-2xl font-bold">${avgExpense}</p>
