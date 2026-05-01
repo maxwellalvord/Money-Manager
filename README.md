@@ -33,6 +33,7 @@ Neon
 Emoji Picker React
 Recharts
 React-PayPal-js
+Google Clould Console (for OAuth)
 
 ## Learn More
 
