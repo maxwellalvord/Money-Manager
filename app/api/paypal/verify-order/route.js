@@ -1,6 +1,7 @@
-"use server";
+
 
 import { NextResponse } from "next/server";
+console.log("VERIFY ROUTE HIT");
 
 async function getAccessToken() {
   const auth = Buffer.from(
@@ -21,32 +22,61 @@ async function getAccessToken() {
 }
 
 export async function POST(req) {
-  const { orderID } = await req.json();
+  try {
+    const { orderID } = await req.json();
 
-  const accessToken = await getAccessToken();
+    const accessToken = await getAccessToken();
 
- const captureRes = await fetch(
-    `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${accessToken}`,
-        "Content-Type": "application/json",
-      },
+    const captureRes = await fetch(
+      `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+
+    const capture = await captureRes.json();
+
+    console.log("PAYPAL CAPTURE RESPONSE:", capture);
+
+    if (!captureRes.ok) {
+      return NextResponse.json(
+        {
+          status: "FAILED",
+          error: capture,
+        },
+        { status: 400 }
+      );
     }
-  );
 
-  const capture = await captureRes.json();
+    if (capture.status === "COMPLETED") {
+      return NextResponse.json({
+        status: "COMPLETED",
+        id: capture.id,
+      });
+    }
 
-  if (capture.status === "COMPLETED") {
-    return NextResponse.json({
-      status: "COMPLETED",
-      id: capture.id,
-    });
+    return NextResponse.json(
+      {
+        status: "FAILED",
+        reason: capture.status,
+        details: capture,
+      },
+      { status: 400 }
+    );
+  } catch (err) {
+    console.error("CAPTURE ERROR:", err);
+
+    return NextResponse.json(
+      {
+        status: "ERROR",
+        message: err.message,
+      },
+      { status: 500 }
+    );
+    
   }
-
-  return NextResponse.json({
-    status: "FAILED",
-    details: capture,
-  });
 }

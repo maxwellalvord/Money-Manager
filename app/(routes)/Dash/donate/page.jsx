@@ -61,8 +61,7 @@ export default function Page() {
                     options={{
                         "client-id": process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID,
                         currency: "USD",
-                        components: "buttons",
-                        "enable-funding": "venmo",
+                        components: "buttons"
                     }}
                 >
                     <PayPalButtons
@@ -71,21 +70,30 @@ export default function Page() {
 
                         createOrder={async () => {
                             if (!isValidTier) {
-                                alert("Minimum donation is $1");
-                                return;
+                                throw new Error("Invalid tier");
                             }
 
                             const res = await fetch("/api/paypal/create-order", {
                                 method: "POST",
                                 headers: {
-                                    "Content-Type": "application/json",
+                                "Content-Type": "application/json",
                                 },
                                 body: JSON.stringify({ amount: parseFloat(tier) }),
                             });
 
+                            if (!res.ok) {
+                                const err = await res.text();
+                                throw new Error("Create order failed");
+                            }
+
                             const order = await res.json();
+
+                            if (!order?.id) {
+                                throw new Error("Missing order ID");
+                            }
+
                             return order.id;
-                        }}
+                            }}
 
                         onApprove={async (data) => {
                             const res = await fetch("/api/paypal/verify-order", {
