@@ -1,8 +1,10 @@
+"use server";
+
 import { NextResponse } from "next/server";
 
 async function getAccessToken() {
   const auth = Buffer.from(
-    `${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
   ).toString("base64");
 
   const res = await fetch("https://api-m.paypal.com/v1/oauth2/token", {

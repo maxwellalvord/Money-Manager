@@ -1,8 +1,10 @@
+"use server";
+
 import { NextResponse } from "next/server";
 
 async function getAccessToken() {
   const auth = Buffer.from(
-    `${process.env.NEXT_PUBLIC_PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
+    `${process.env.PAYPAL_CLIENT_ID}:${process.env.PAYPAL_CLIENT_SECRET}`
   ).toString("base64");
 
   const res = await fetch("https://api-m.paypal.com/v1/oauth2/token", {
@@ -23,25 +25,28 @@ export async function POST(req) {
 
   const accessToken = await getAccessToken();
 
-  const res = await fetch(
-    `https://api-m.paypal.com/v2/checkout/orders/${orderID}`,
+ const captureRes = await fetch(
+    `https://api-m.paypal.com/v2/checkout/orders/${orderID}/capture`,
     {
+      method: "POST",
       headers: {
         Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json",
       },
     }
   );
 
-  const order = await res.json();
+  const capture = await captureRes.json();
 
-  if (order.status === "COMPLETED") {
+  if (capture.status === "COMPLETED") {
     return NextResponse.json({
       status: "COMPLETED",
-      id: order.id,
+      id: capture.id,
     });
   }
 
   return NextResponse.json({
     status: "FAILED",
+    details: capture,
   });
 }
