@@ -17,6 +17,7 @@ async function getAccessToken() {
   });
 
   const data = await res.json();
+  
   return data.access_token;
 }
 
@@ -26,6 +27,14 @@ export async function POST(req) {
   const safeAmount = Math.max(1, parseFloat(amount) || 1).toFixed(2);
 
   const accessToken = await getAccessToken();
+  
+
+  if (!accessToken) {
+    return NextResponse.json(
+      { error: "Failed to get PayPal access token" },
+      { status: 500 }
+    );
+  }
 
   const orderRes = await fetch(
     "https://api-m.paypal.com/v2/checkout/orders",
@@ -49,7 +58,30 @@ export async function POST(req) {
     }
   );
 
-  const order = await orderRes.json();
+  const data = await orderRes.json();
 
-  return NextResponse.json(order);
+  if (!orderRes.ok) {
+    console.error("PayPal order error:", data);
+
+    return NextResponse.json(
+      {
+        error: "PayPal order creation failed",
+        details: data,
+      },
+      { status: 500 }
+    );
+  }
+
+  if (!data?.id) {
+    return NextResponse.json(
+      {
+        error: "No order ID returned",
+        data,
+      },
+      { status: 500 }
+    );
+  }
+  
+
+  return NextResponse.json({ id: data.id });
 }
