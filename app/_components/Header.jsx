@@ -11,11 +11,19 @@ function Header() {
 
   return (
     <div className='p-5 flex justify-between items-center'>
-      <Image src={'./logo.svg'} alt='logo' width={160} height={100} />
+      <div className="rounded-full overflow-hidden">
+        <Image
+          src={'./logo.svg'}
+          alt="logo"
+          width={160}
+          height={100}
+          className="object-cover"
+        />
+      </div>
 
-      <p className="text-3xl font-extrabold text-black tracking-tight uppercase leading-none flex items-end gap-1">
+      <p className="text-3xl font-extrabold text-foreground tracking-tight uppercase leading-none flex items-end gap-1">
         <span className="font-extrabold">Money</span>
-        <span className="font-light tracking-widest text-black/80">Manager</span>
+        <span className="font-light tracking-widest text-foreground">Manager</span>
       </p>
 
       {isSignedIn ? (

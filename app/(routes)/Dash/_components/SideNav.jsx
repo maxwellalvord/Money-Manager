@@ -40,11 +40,17 @@ function SideNav() {
 
     return (
         <div className='h-screen p-5 border shadow-sm'>
-            <Image src='/logo.svg'
-                alt='logo'
-                width={160}
-                height={100}
-            />
+            <div className="w-full flex justify-center py-4">
+                <div className="w-35 h-35 flex items-center justify-center rounded-2xl bg-white overflow-hidden">
+                    <Image
+                        src="/logo.svg"
+                        alt="logo"
+                        width={120}
+                        height={120}
+                        className="object-contain"
+                    />
+                </div>
+            </div>
             <div className='mt-5'>
                 {menuList.map((menu, index) => {
                     const Icon = menu.icon;
