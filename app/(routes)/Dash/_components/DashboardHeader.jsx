@@ -1,6 +1,7 @@
 import { UserButton } from '@clerk/nextjs'
 import React from 'react'
 import ThemeToggle from '@/app/_components/ThemeToggle'
+import EditMonthlyBudget from './EditMonthlyBudget'
 
 function DashboardHeader() {
   return (
@@ -10,8 +11,8 @@ function DashboardHeader() {
         <span className="font-light tracking-widest text-foreground">Manager</span>
       </p>
       <div className="flex items-center gap-3">
-      <ThemeToggle />
-      
+        <EditMonthlyBudget />
+        <ThemeToggle />
         <UserButton />
       </div>
     </div>

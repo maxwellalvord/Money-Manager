@@ -1,45 +1,35 @@
 "use client"
 import React, { useState, useEffect, useMemo } from 'react'
 import ExpenseListTable from './_components/ExpenseListTable'
-import { db } from '@/utils/dbConfig'
-import { Budgets, Expenses as ExpensesTable } from '@/utils/schema'
-import { eq, getTableColumns, sql } from 'drizzle-orm'
 import { useUser } from '@clerk/nextjs'
 import { PiggyBank, ReceiptText, TrendingUp } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
-import { useRouter } from 'next/navigation'
+import { getExpensesByUser, getBudgetsWithSpendForExpenses } from '@/app/actions/expenses'
 
 const COLORS = ['#534AB7', '#1D9E75', '#BA7517', '#D4537E', '#378ADD', '#639922']
 
 function Expenses() {
   const [expensesList, setExpensesList] = useState([])
   const [budgetList, setBudgetList] = useState([])
-  const { user } = useUser()
-  const router = useRouter()
+  const { isLoaded, user } = useUser()
 
   useEffect(() => {
-    if (user) {
-      getExpensesAndBudgets()
+    if (isLoaded && user) {
+      loadData()
     }
-  }, [user])
+  }, [isLoaded, user])
 
-  const getExpensesAndBudgets = async () => {
-    const expRes = await db
-      .select()
-      .from(ExpensesTable)
-      .where(eq(ExpensesTable.createdBy, user?.primaryEmailAddress?.emailAddress))
-    setExpensesList(expRes)
-
-    const budgetRes = await db
-      .select({
-        ...getTableColumns(Budgets),
-        totalSpend: sql`sum(${ExpensesTable.amount})`.mapWith(Number),
-      })
-      .from(Budgets)
-      .leftJoin(ExpensesTable, eq(Budgets.id, ExpensesTable.budgetId))
-      .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
-      .groupBy(Budgets.id)
-    setBudgetList(budgetRes)
+  const loadData = async () => {
+    try {
+      const [expenses, budgets] = await Promise.all([
+        getExpensesByUser(),
+        getBudgetsWithSpendForExpenses(),
+      ]);
+      setExpensesList(expenses)
+      setBudgetList(budgets)
+    } catch (err) {
+      console.error('Failed to load expenses:', err)
+    }
   }
 
   const totalSpent = useMemo(
@@ -56,17 +46,11 @@ function Expenses() {
     .map((b) => ({ name: b.name, value: b.totalSpend, icon: b.icon }))
 
   return (
-    <div
-      className="p-6 flex flex-col gap-5"
-      style={{ minHeight: 'calc(100vh - 60px)' }}
-    >
-
+    <div className="p-6 flex flex-col gap-5" style={{ minHeight: 'calc(100vh - 60px)' }}>
       <div className='flex items-center gap-3'>
         <h2 className="font-bold text-2xl">My Expenses</h2>
       </div>
 
-
-      {/* Summary cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
@@ -91,54 +75,30 @@ function Expenses() {
         </div>
       </div>
 
-      {/* Pie chart + table */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
-
-        {/* Pie chart panel */}
         <div className="border rounded-lg p-5 flex flex-col">
           <h3 className="font-bold text-lg mb-4">Spending by Budget</h3>
-
           {pieData.length > 0 ? (
             <>
               <div className="flex-1" style={{ minHeight: '260px' }}>
                 <ResponsiveContainer width="100%" height="100%">
                   <PieChart>
-                    <Pie
-                      data={pieData}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius="45%"
-                      outerRadius="70%"
-                      dataKey="value"
-                    >
+                    <Pie data={pieData} cx="50%" cy="50%" innerRadius="45%" outerRadius="70%" dataKey="value">
                       {pieData.map((_, index) => (
-                        <Cell
-                          key={index}
-                          fill={COLORS[index % COLORS.length]}
-                        />
+                        <Cell key={index} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
-                    <Tooltip
-                      formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Spent']}
-                    />
+                    <Tooltip formatter={(value) => [`$${Number(value).toFixed(2)}`, 'Spent']} />
                   </PieChart>
                 </ResponsiveContainer>
               </div>
-
-              {/* Legend */}
               <div className="mt-4 flex flex-col gap-2">
                 {pieData.map((entry, i) => (
                   <div key={i} className="flex items-center gap-2 text-sm">
-                    <span
-                      className="w-3 h-3 rounded-sm flex-shrink-0"
-                      style={{ background: COLORS[i % COLORS.length] }}
-                    />
-                    <span className="flex-1 text-gray-600">
-                      {entry.icon} {entry.name}
-                    </span>
-                    <span className="font-medium">
-                      ${Number(entry.value).toFixed(2)}
-                    </span>
+                    <span className="w-3 h-3 rounded-sm flex-shrink-0"
+                      style={{ background: COLORS[i % COLORS.length] }} />
+                    <span className="flex-1 text-gray-600">{entry.icon} {entry.name}</span>
+                    <span className="font-medium">${Number(entry.value).toFixed(2)}</span>
                   </div>
                 ))}
               </div>
@@ -150,16 +110,11 @@ function Expenses() {
           )}
         </div>
 
-        {/* Expense table panel */}
         <div className="border rounded-lg p-5 flex flex-col">
           <div className="flex-1 overflow-y-auto">
-            <ExpenseListTable
-              expensesList={expensesList}
-              refreshData={getExpensesAndBudgets}
-            />
+            <ExpenseListTable expensesList={expensesList} refreshData={loadData} />
           </div>
         </div>
-
       </div>
     </div>
   )

@@ -8,6 +8,6 @@ export default defineConfig({
   dialect: 'postgresql', // 'mysql' | 'sqlite' | 'turso'
   schema: "./utils/schema.jsx",
   dbCredentials: {
-    url: process.env.NEXT_PUBLIC_DATABASE_URL || process.env.DATABASE_URL,
+    url: process.env.DATABASE_URL,
   },
 })

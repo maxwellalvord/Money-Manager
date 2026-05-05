@@ -1,53 +1,48 @@
 "use client"
-import { UserButton, useUser } from '@clerk/nextjs'
+import { useUser } from '@clerk/nextjs'
 import React, { useEffect, useState } from 'react'
 import CardInfo from './_components/CardInfo'
-import { db } from '@/utils/dbConfig';
-import { Budgets, Expenses } from '@/utils/schema';
-import { desc, eq, getTableColumns, sql } from 'drizzle-orm';
-import BarChartDash from './_components/BarChartDash';
-import BudgetItem from './budgets/_components/BudgetItem';
-import ExpenseListTable from './expenses/_components/ExpenseListTable';
+import BarChartDash from './_components/BarChartDash'
+import BudgetItem from './budgets/_components/BudgetItem'
+import ExpenseListTable from './expenses/_components/ExpenseListTable'
+import BudgetCalendar from './_components/BudgetCalendar'
+import { getBudgetsWithSpend } from '@/app/actions/budgets'
+import { getSettings } from '@/app/actions/settings'
+import { getAllExpenses } from '@/app/actions/expenses'
 
 function Dash() {
-
-
-
   const [budgetList, setBudgetList] = useState([]);
-  const { user } = useUser();
   const [expensesList, setExpensesList] = useState([]);
+  const [monthlyBudget, setMonthlyBudget] = useState(0);
+  const [budgetEndDay, setBudgetEndDay] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const { isLoaded, user } = useUser();
+
   useEffect(() => {
-    user && getBudgetList();
-  }, [user])
+    if (isLoaded && user) {
+      loadData();
+    }
+  }, [isLoaded, user])
 
-  // join budget and expense table to get budget list
-  const getBudgetList = async () => {
-    const result = await db.select({
-      ...getTableColumns(Budgets),
-      totalSpend: sql`sum(${Expenses.amount})`.mapWith(Number),
-      totalItem: sql`count(${Expenses.id})`.mapWith(Number),
-    }).from(Budgets)
-      .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-      .where(eq(Budgets.createdBy, user.primaryEmailAddress?.emailAddress))
-      .groupBy(Budgets.id)
-      .orderBy(desc(Budgets.id))
-
-    setBudgetList(result);
-    getAllExpenses();
-  }
-
-  const getAllExpenses = async () => {
-    const res = await db.select({
-      id: Expenses.id,
-      name: Expenses.name,
-      amount: Expenses.amount,
-      createdAt: Expenses.createdAt,
-    }).from(Budgets)
-      .rightJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
-      .where(eq(Budgets.createdBy, user?.primaryEmailAddress?.emailAddress))
-      .orderBy(desc(Expenses.createdAt));
-
-    setExpensesList(res);
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [budgets, settings, expenses] = await Promise.all([
+        getBudgetsWithSpend(),
+        getSettings(),
+        getAllExpenses(),
+      ]);
+      setBudgetList(budgets);
+      setExpensesList(expenses);
+      if (settings.length > 0) {
+        setMonthlyBudget(Number(settings[0].monthlyBudget));
+        setBudgetEndDay(settings[0].budgetEndDay ?? null);
+      }
+    } catch (err) {
+      console.error('Failed to load dashboard data:', err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   return (
@@ -60,18 +55,17 @@ function Dash() {
         <p className='ml-8 mt-3 max-w-2xl rounded-2xl bg-blue-50/70 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm'>Check down below for a quick breakdown of your budgets.</p>
       </div>
 
-      <CardInfo budgetList={budgetList} />
+      <CardInfo budgetList={budgetList} monthlyBudget={monthlyBudget} loading={loading} />
       <div className='grid grid-cols-1 md:grid-cols-3 mt-7 gap-5'>
         <div className='md:col-span-2'>
-          <BarChartDash
-            budgetList={budgetList} />
-
+          <BarChartDash budgetList={budgetList} />
           <ExpenseListTable
             expensesList={expensesList}
-            refreshData={() => getBudgetList()}
+            refreshData={loadData}
           />
         </div>
         <div className='grid gap-4'>
+          <BudgetCalendar budgetEndDay={budgetEndDay} />
           <h2 className='font-bold text-lg'>Latest Budgets</h2>
           {budgetList.map((budget, i) => (
             <BudgetItem budget={budget} key={i} />

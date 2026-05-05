@@ -1,35 +1,85 @@
 "use client"
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import SideNav from './_components/SideNav'
 import DashboardHeader from './_components/DashboardHeader'
-import { db } from '@/utils/dbConfig'
-import { Budgets } from '@/utils/schema'
 import { useUser } from '@clerk/nextjs'
-import { eq } from 'drizzle-orm'
 import { useRouter } from 'next/navigation'
+import SetMonthlyBudget from './_components/SetMonthlyBudget'
+import BudgetPeriodEndPrompt from './_components/BudgetPeriodEndPrompt'
+import { getSettings } from '@/app/actions/settings'
+import { getBudgetsWithSpend } from '@/app/actions/budgets'
+
+function periodHasEnded(settings) {
+  if (!settings?.budgetEndDay) return false
+  const today = new Date()
+  const todayDate = today.getDate()
+  const endDay = settings.budgetEndDay
+  const daysInMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0).getDate()
+  const clampedEndDay = Math.min(endDay, daysInMonth)
+
+  if (todayDate <= clampedEndDay) return false
+
+  const periodEndDate = new Date(today.getFullYear(), today.getMonth(), clampedEndDay)
+  const periodStart = settings.budgetPeriodStart ? new Date(settings.budgetPeriodStart) : null
+  return !periodStart || periodStart <= periodEndDate
+}
 
 function Dashlayout({ children }) {
-
-  const user = useUser();
+  const { isLoaded, user } = useUser();
   const router = useRouter();
+  const [showBudgetSetup, setShowBudgetSetup] = useState(false);
+  const [showPeriodEndPrompt, setShowPeriodEndPrompt] = useState(false);
+  const [currentSettings, setCurrentSettings] = useState(null);
 
   useEffect(() => {
-    if (user.isLoaded && user.user) {
-      checkUserBudgets();
+    if (isLoaded && user) {
+      checkUserSettings();
     }
-  }, [user])
+  }, [isLoaded, user])
 
-  const checkUserBudgets = async () => {
-    const result = await db.select()
-      .from(Budgets)
-      .where(eq(Budgets.createdBy, user.user.primaryEmailAddress.emailAddress))
+  const checkUserSettings = async () => {
+    try {
+      const settings = await getSettings();
 
-    if (result.length === 0) {
-      router.replace('/Dash/budgets');
+      if (settings.length === 0) {
+        setShowBudgetSetup(true);
+        return;
+      }
+
+      const s = settings[0];
+      setCurrentSettings(s);
+
+      if (periodHasEnded(s)) {
+        setShowPeriodEndPrompt(true);
+        return;
+      }
+
+      const budgets = await getBudgetsWithSpend();
+      if (budgets.length === 0) {
+        router.replace('/Dash/budgets');
+      }
+    } catch (err) {
+      console.error('Failed to load user settings:', err);
     }
   }
+
+  const onMonthlyBudgetSet = () => {
+    setShowBudgetSetup(false);
+    router.replace('/Dash/budgets');
+  }
+
+  const onPeriodEndDismiss = () => {
+    setShowPeriodEndPrompt(false);
+  }
+
   return (
-    <div >
+    <div>
+      <SetMonthlyBudget open={showBudgetSetup} onSet={onMonthlyBudgetSet} />
+      <BudgetPeriodEndPrompt
+        open={showPeriodEndPrompt}
+        currentSettings={currentSettings}
+        onDismiss={onPeriodEndDismiss}
+      />
       <div className='fixed md:w-64 hidden md:block'>
         <SideNav />
       </div>

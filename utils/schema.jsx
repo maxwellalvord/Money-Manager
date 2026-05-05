@@ -16,3 +16,11 @@ export const Expenses = pgTable("expenses",{
     createdBy:varchar('createdBy'),
     createdAt:varchar('createdAt').notNull(),
 })
+
+export const UserSettings = pgTable("user_settings", {
+    id: serial('id').primaryKey(),
+    email: varchar('email').notNull().unique(),
+    monthlyBudget: numeric('monthlyBudget').notNull(),
+    budgetEndDay: integer('budgetEndDay'),
+    budgetPeriodStart: varchar('budgetPeriodStart'),
+})
