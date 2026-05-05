@@ -57,21 +57,21 @@ function Expenses() {
             <p className="text-sm text-gray-500">Total Spent</p>
             <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
           </div>
-          <PiggyBank className="bg-primary p-2 h-10 w-10 rounded-full text-white" />
+          <PiggyBank className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground" />
         </div>
         <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">No. of Expenses</p>
             <p className="text-2xl font-bold">{expensesList.length}</p>
           </div>
-          <ReceiptText className="bg-primary p-2 h-10 w-10 rounded-full text-white" />
+          <ReceiptText className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground" />
         </div>
         <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Avg per Expense</p>
             <p className="text-2xl font-bold">${avgExpense}</p>
           </div>
-          <TrendingUp className="bg-primary p-2 h-10 w-10 rounded-full text-white" />
+          <TrendingUp className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground" />
         </div>
       </div>
 

@@ -76,7 +76,7 @@ function EditMonthlyBudget() {
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="flex gap-2" onClick={onOpen}>
           <PenBox className="h-4 w-4" />
-          Edit Monthly Budget
+          <span className="hidden sm:inline">Edit Monthly Budget</span>
         </Button>
       </DialogTrigger>
       <DialogContent>

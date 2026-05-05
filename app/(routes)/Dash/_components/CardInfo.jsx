@@ -35,14 +35,14 @@ function CardInfo({ budgetList, monthlyBudget, loading }) {
                                 ${totalAllocated.toLocaleString()} allocated
                             </p>
                         </div>
-                        <PiggyBank className='bg-primary p-3 h-12 w-12 rounded-full text-white flex-shrink-0' />
+                        <PiggyBank className='bg-primary p-3 h-12 w-12 rounded-full text-primary-foreground flex-shrink-0' />
                     </div>
                     <div className='p-7 border rounded-lg flex items-center justify-between'>
                         <div>
                             <h2 className='text-sm font-bold'>Total Spent</h2>
                             <h2 className='font-bold text-2xl'>${totalSpend.toLocaleString()}</h2>
                         </div>
-                        <ReceiptText className='bg-primary p-3 h-12 w-12 rounded-full text-white flex-shrink-0' />
+                        <ReceiptText className='bg-primary p-3 h-12 w-12 rounded-full text-primary-foreground flex-shrink-0' />
                     </div>
                     <div className='p-7 border rounded-lg flex items-center justify-between'>
                         <div>
@@ -51,14 +51,14 @@ function CardInfo({ budgetList, monthlyBudget, loading }) {
                                 ${remainingMonthly.toLocaleString()}
                             </h2>
                         </div>
-                        <Wallet className={`p-3 h-12 w-12 rounded-full text-white flex-shrink-0 ${remainingMonthly < 0 ? 'bg-red-500' : 'bg-primary'}`} />
+                        <Wallet className={`p-3 h-12 w-12 rounded-full text-primary-foreground flex-shrink-0 ${remainingMonthly < 0 ? 'bg-red-500' : 'bg-primary'}`} />
                     </div>
                     <div className='p-7 border rounded-lg flex items-center justify-between'>
                         <div>
                             <h2 className='text-sm font-bold'># of Budgets</h2>
                             <h2 className='font-bold text-2xl'>{budgetList.length}</h2>
                         </div>
-                        <Wallet className='bg-primary p-3 h-12 w-12 rounded-full text-white flex-shrink-0' />
+                        <Wallet className='bg-primary p-3 h-12 w-12 rounded-full text-primary-foreground flex-shrink-0' />
                     </div>
                 </div>
                 :

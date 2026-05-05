@@ -46,13 +46,13 @@ function Dash() {
   }
 
   return (
-    <div className='p-8'>
+    <div className='p-4 sm:p-8'>
       <div className=''>
-        <h2 className='font-bold text-3xl relative inline-block mb-2'>
+        <h2 className='font-bold text-2xl sm:text-3xl relative inline-block mb-2'>
           <span className='relative z-10'>Welcome, {user?.firstName || "loading user"}!</span>
-          <div className='absolute -left-8 -top-4 -bottom-4 -right-8 border-2 border-l-0 border-blue-200 rounded-r-full shadow-lg bg-gradient-to-r from-blue-50 to-transparent'></div>
+          <div className='absolute -left-4 sm:-left-8 -top-4 -bottom-4 -right-4 sm:-right-8 border-2 border-l-0 border-blue-200 rounded-r-full shadow-lg bg-gradient-to-r from-blue-50 to-transparent'></div>
         </h2>
-        <p className='ml-8 mt-3 max-w-2xl rounded-2xl bg-blue-50/70 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm'>Check down below for a quick breakdown of your budgets.</p>
+        <p className='ml-4 sm:ml-8 mt-3 max-w-2xl rounded-2xl bg-blue-50/70 px-4 py-3 text-sm font-medium text-slate-700 shadow-sm'>Check down below for a quick breakdown of your budgets.</p>
       </div>
 
       <CardInfo budgetList={budgetList} monthlyBudget={monthlyBudget} loading={loading} />

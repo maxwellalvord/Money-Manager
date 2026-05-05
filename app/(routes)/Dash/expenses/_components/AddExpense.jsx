@@ -47,10 +47,11 @@ function AddExpense({ budget, budgetId, refreshData }) {
 
     return (
         <div className='border p-5 rounded-lg'>
-            <div className='flex justify-between items-center mb-4'>
+            <div className='flex flex-wrap justify-between items-center gap-2 mb-4'>
                 <h2 className='font-bold text-lg'>Add Expense</h2>
-                <Button variant='outline' onClick={() => setClearOnSubmit(clearOnSubmit ? 0 : 1)}>
-                    {clearOnSubmit ? 'Clear contents on submit: Enabled' : 'Clear contents on submit: Disabled'}
+                <Button variant='outline' size='sm' onClick={() => setClearOnSubmit(clearOnSubmit ? 0 : 1)}>
+                    <span className="hidden sm:inline">{clearOnSubmit ? 'Clear contents on submit: Enabled' : 'Clear contents on submit: Disabled'}</span>
+                    <span className="sm:hidden">{clearOnSubmit ? 'Clear: On' : 'Clear: Off'}</span>
                 </Button>
             </div>
             <div className='mt-2'>

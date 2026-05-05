@@ -30,6 +30,7 @@ function Dashlayout({ children }) {
   const [showBudgetSetup, setShowBudgetSetup] = useState(false);
   const [showPeriodEndPrompt, setShowPeriodEndPrompt] = useState(false);
   const [currentSettings, setCurrentSettings] = useState(null);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -80,11 +81,19 @@ function Dashlayout({ children }) {
         currentSettings={currentSettings}
         onDismiss={onPeriodEndDismiss}
       />
-      <div className='fixed md:w-64 hidden md:block'>
-        <SideNav />
+      {mobileNavOpen && (
+        <div
+          className='fixed inset-0 bg-black/50 z-40 md:hidden'
+          onClick={() => setMobileNavOpen(false)}
+        />
+      )}
+      <div className={`fixed top-0 left-0 h-screen w-64 z-50 transition-transform duration-300 md:translate-x-0 ${
+        mobileNavOpen ? 'translate-x-0' : '-translate-x-full'
+      }`}>
+        <SideNav onClose={() => setMobileNavOpen(false)} />
       </div>
-      <div className='md:ml-64 '>
-        <DashboardHeader />
+      <div className='md:ml-64'>
+        <DashboardHeader onMenuToggle={() => setMobileNavOpen(prev => !prev)} />
         {children}
       </div>
     </div>
