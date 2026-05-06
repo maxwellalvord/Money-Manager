@@ -2,9 +2,10 @@ import { UserButton } from '@clerk/nextjs'
 import React from 'react'
 import ThemeToggle from '@/app/_components/ThemeToggle'
 import EditMonthlyBudget from './EditMonthlyBudget'
-import { Menu } from 'lucide-react'
+import { Menu, CalendarX } from 'lucide-react'
+import { Button } from '@/components/ui/button'
 
-function DashboardHeader({ onMenuToggle }) {
+function DashboardHeader({ onMenuToggle, onForceMonthEnd, hasSettings }) {
   return (
     <div className='p-4 sm:p-5 shadow-sm border flex justify-between items-center'>
       <div className="flex items-center gap-2">
@@ -21,6 +22,17 @@ function DashboardHeader({ onMenuToggle }) {
         </p>
       </div>
       <div className="flex flex-wrap justify-end items-center gap-2 sm:gap-3">
+        {hasSettings && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex gap-2 border-blue-400 text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:border-white dark:text-white dark:hover:bg-white/10"
+            onClick={onForceMonthEnd}
+          >
+            <CalendarX className="h-4 w-4" />
+            <span className="hidden sm:inline">End Month</span>
+          </Button>
+        )}
         <EditMonthlyBudget />
         <ThemeToggle />
         <UserButton />

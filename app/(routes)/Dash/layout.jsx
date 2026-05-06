@@ -93,7 +93,11 @@ function Dashlayout({ children }) {
         <SideNav onClose={() => setMobileNavOpen(false)} />
       </div>
       <div className='md:ml-64'>
-        <DashboardHeader onMenuToggle={() => setMobileNavOpen(prev => !prev)} />
+        <DashboardHeader
+          onMenuToggle={() => setMobileNavOpen(prev => !prev)}
+          onForceMonthEnd={() => setShowPeriodEndPrompt(true)}
+          hasSettings={!!currentSettings}
+        />
         {children}
       </div>
     </div>
