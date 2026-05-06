@@ -36,7 +36,7 @@ function BudgetList() {
     }
   }
 
-  const totalAllocated = budgetList.reduce((sum, b) => sum + Number(b.amount), 0);
+  const totalAllocated = budgetList.filter(b => !b.isSavings).reduce((sum, b) => sum + Number(b.amount), 0);
   const remainingToAllocate = monthlyBudget - totalAllocated;
 
   return (
@@ -57,7 +57,7 @@ function BudgetList() {
               ${remainingToAllocate.toLocaleString()}
             </p>
           </div>
-          <div className='w-full h-2 bg-slate-200 rounded-full overflow-hidden'>
+          <div className='w-full h-2 bg-slate-200 dark:bg-slate-600 rounded-full overflow-hidden'>
             <div
               className={`h-2 rounded-full transition-all ${totalAllocated > monthlyBudget ? 'bg-red-500' : 'bg-primary'}`}
               style={{ width: `${Math.min((totalAllocated / monthlyBudget) * 100, 100)}%` }}

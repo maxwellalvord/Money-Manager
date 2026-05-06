@@ -21,7 +21,7 @@ function periodHasEnded(settings) {
 
   const periodEndDate = new Date(today.getFullYear(), today.getMonth(), clampedEndDay)
   const periodStart = settings.budgetPeriodStart ? new Date(settings.budgetPeriodStart) : null
-  return !periodStart || periodStart <= periodEndDate
+  return !!periodStart && periodStart <= periodEndDate
 }
 
 function Dashlayout({ children }) {

@@ -11,6 +11,8 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { updateSettings } from '@/app/actions/settings'
+import { triggerMonthEnd } from '@/app/actions/savings'
+import { deleteAllNonSavingsBudgets } from '@/app/actions/budgets'
 import { toast } from 'sonner'
 import { RefreshCw, ArrowRight } from 'lucide-react'
 
@@ -18,17 +20,14 @@ function BudgetPeriodEndPrompt({ open, currentSettings, onDismiss }) {
   const [mode, setMode] = useState('choose')
   const [newAmount, setNewAmount] = useState(String(currentSettings?.monthlyBudget ?? ''))
 
-  const resetPeriodStart = async (amount) => {
-    await updateSettings({
-      monthlyBudget: String(amount),
-      budgetPeriodStart: new Date().toISOString(),
-    })
-  }
-
   const onContinueLastMonth = async () => {
     try {
-      await resetPeriodStart(currentSettings.monthlyBudget)
-      toast.success("Continuing with last month's budget!")
+      const { savedAmount } = await triggerMonthEnd()
+      if (savedAmount > 0) {
+        toast.success(`$${savedAmount.toFixed(2)} moved to Savings. Continuing with last month's budget!`)
+      } else {
+        toast.success("Continuing with last month's budget!")
+      }
       onDismiss()
     } catch {
       toast.error("Failed to update budget period.")
@@ -42,8 +41,14 @@ function BudgetPeriodEndPrompt({ open, currentSettings, onDismiss }) {
       return
     }
     try {
-      await resetPeriodStart(parsed)
-      toast.success("New budget period started!")
+      const { savedAmount } = await triggerMonthEnd()
+      await deleteAllNonSavingsBudgets()
+      await updateSettings({ monthlyBudget: String(parsed) })
+      if (savedAmount > 0) {
+        toast.success(`$${savedAmount.toFixed(2)} moved to Savings. Starting fresh!`)
+      } else {
+        toast.success("Starting fresh with a new budget!")
+      }
       onDismiss()
     } catch {
       toast.error("Failed to start new budget period.")
@@ -73,27 +78,31 @@ function BudgetPeriodEndPrompt({ open, currentSettings, onDismiss }) {
           <div className="flex flex-col gap-3 mt-2">
             <Button
               variant="outline"
-              className="w-full flex justify-between items-center h-auto py-4 px-4"
+              className="w-full h-auto py-4 px-4"
               onClick={onContinueLastMonth}
             >
-              <div className="text-left">
-                <p className="font-semibold">Continue with Last Month&apos;s Budget</p>
-                <p className="text-xs text-muted-foreground mt-0.5">
-                  Keep ${Number(currentSettings?.monthlyBudget).toLocaleString()} for {month}
-                </p>
+              <div className="flex items-center justify-between w-full gap-3 min-w-0">
+                <div className="text-left min-w-0">
+                  <p className="font-semibold">Continue with Last Month&apos;s Budget</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">
+                    Keep ${Number(currentSettings?.monthlyBudget).toLocaleString()} for {month}
+                  </p>
+                </div>
+                <ArrowRight className="h-4 w-4 flex-shrink-0" />
               </div>
-              <ArrowRight className="h-4 w-4 flex-shrink-0" />
             </Button>
 
             <Button
-              className="w-full flex justify-between items-center h-auto py-4 px-4"
+              className="w-full h-auto py-4 px-4"
               onClick={() => setMode('new')}
             >
-              <div className="text-left">
-                <p className="font-semibold">Start a New Budget</p>
-                <p className="text-xs text-white/80 mt-0.5">Set a different amount for {month}</p>
+              <div className="flex items-center justify-between w-full gap-3 min-w-0">
+                <div className="text-left min-w-0">
+                  <p className="font-semibold">Start Fresh</p>
+                  <p className="text-xs text-white/80 mt-0.5">New amount, clear all budgets for {month}</p>
+                </div>
+                <ArrowRight className="h-4 w-4 flex-shrink-0" />
               </div>
-              <ArrowRight className="h-4 w-4 flex-shrink-0" />
             </Button>
           </div>
         )}
@@ -111,12 +120,11 @@ function BudgetPeriodEndPrompt({ open, currentSettings, onDismiss }) {
                 onKeyDown={(e) => e.key === 'Enter' && onStartNewBudget()}
               />
             </div>
-            <div className="flex gap-2 mt-4">
-              <Button variant="outline" onClick={() => setMode('choose')} className="w-full">Back</Button>
+            <div className="grid grid-cols-2 gap-2 mt-4">
+              <Button variant="outline" onClick={() => setMode('choose')}>Back</Button>
               <Button
                 disabled={!newAmount || Number(newAmount) <= 0}
                 onClick={onStartNewBudget}
-                className="w-full"
               >
                 Start {month}
               </Button>

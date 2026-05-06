@@ -3,6 +3,8 @@ import { useUser } from '@clerk/nextjs'
 import React, { use, useEffect, useState } from 'react'
 import BudgetItem from '../../budgets/_components/BudgetItem'
 import AddExpense from '../_components/AddExpense'
+import SavingsTransfer from '../_components/SavingsTransfer'
+import SavingsHistory from '../_components/SavingsHistory'
 import ExpenseListTable from '../_components/ExpenseListTable'
 import { Button } from '@/components/ui/button'
 import { Trash } from 'lucide-react'
@@ -58,6 +60,57 @@ function ExpensesScreen({ params }) {
     } catch {
       toast.error('Error Deleting Budget!');
     }
+  }
+
+  const isSavings = budgetInfo?.isSavings === 1
+  const savingsRemaining = budgetInfo
+    ? Math.max(0, Number(budgetInfo.amount) - Number(budgetInfo.totalSpend || 0))
+    : 0
+
+  if (isSavings) {
+    return (
+      <div className='p-8'>
+        <h2 className='text-3xl font-bold flex justify-between items-center'>
+          <div className='flex items-center gap-3'>
+            <span className='text-4xl'>💰</span>
+            Savings
+          </div>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button className='flex gap-2' variant="destructive"><Trash /> Delete</Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete your Savings budget and all its transaction history.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={() => deleteBudget()}>Continue</AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </h2>
+
+        <div className='grid grid-cols-1 md:grid-cols-2 mt-5 gap-5'>
+          {budgetInfo
+            ? <BudgetItem budget={budgetInfo} />
+            : <div className='h-[150px] w-full bg-slate-200 rounded-lg animate-pulse' />
+          }
+          <SavingsTransfer
+            savingsBudgetId={Number(id)}
+            savingsRemaining={savingsRemaining}
+            refreshData={getBudgetInfo}
+          />
+        </div>
+
+        <div className='mt-8'>
+          <SavingsHistory expensesList={expensesList} refreshData={getBudgetInfo} />
+        </div>
+      </div>
+    )
   }
 
   return (

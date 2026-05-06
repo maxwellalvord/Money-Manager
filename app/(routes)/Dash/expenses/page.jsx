@@ -2,15 +2,17 @@
 import React, { useState, useEffect, useMemo } from 'react'
 import ExpenseListTable from './_components/ExpenseListTable'
 import { useUser } from '@clerk/nextjs'
-import { PiggyBank, ReceiptText, TrendingUp } from 'lucide-react'
+import { PiggyBank, ReceiptText, TrendingUp, Wallet } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
 import { getExpensesByUser, getBudgetsWithSpendForExpenses } from '@/app/actions/expenses'
+import { getSettings } from '@/app/actions/settings'
 
 const COLORS = ['#534AB7', '#1D9E75', '#BA7517', '#D4537E', '#378ADD', '#639922']
 
 function Expenses() {
   const [expensesList, setExpensesList] = useState([])
   const [budgetList, setBudgetList] = useState([])
+  const [monthlyBudget, setMonthlyBudget] = useState(0)
   const { isLoaded, user } = useUser()
 
   useEffect(() => {
@@ -21,28 +23,34 @@ function Expenses() {
 
   const loadData = async () => {
     try {
-      const [expenses, budgets] = await Promise.all([
+      const [expenses, budgets, settings] = await Promise.all([
         getExpensesByUser(),
         getBudgetsWithSpendForExpenses(),
+        getSettings(),
       ]);
       setExpensesList(expenses)
       setBudgetList(budgets)
+      if (settings.length > 0) setMonthlyBudget(Number(settings[0].monthlyBudget))
     } catch (err) {
       console.error('Failed to load expenses:', err)
     }
   }
 
   const totalSpent = useMemo(
-    () => expensesList.reduce((sum, e) => sum + Number(e.amount), 0),
-    [expensesList]
+    () => budgetList
+      .filter(b => !b.isSavings)
+      .reduce((sum, b) => sum + Number(b.totalSpend || 0), 0),
+    [budgetList]
   )
+
+  const budgetRemaining = monthlyBudget - totalSpent
 
   const avgExpense = expensesList.length
     ? (totalSpent / expensesList.length).toFixed(2)
     : '0.00'
 
   const pieData = budgetList
-    .filter((b) => b.totalSpend > 0)
+    .filter((b) => !b.isSavings && b.totalSpend > 0)
     .map((b) => ({ name: b.name, value: b.totalSpend, icon: b.icon }))
 
   return (
@@ -51,27 +59,39 @@ function Expenses() {
         <h2 className="font-bold text-2xl">My Expenses</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Total Spent</p>
             <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
           </div>
-          <PiggyBank className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground" />
+          <PiggyBank className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground flex-shrink-0" />
         </div>
         <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">No. of Expenses</p>
             <p className="text-2xl font-bold">{expensesList.length}</p>
           </div>
-          <ReceiptText className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground" />
+          <ReceiptText className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground flex-shrink-0" />
         </div>
         <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
           <div>
             <p className="text-sm text-gray-500">Avg per Expense</p>
             <p className="text-2xl font-bold">${avgExpense}</p>
           </div>
-          <TrendingUp className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground" />
+          <TrendingUp className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground flex-shrink-0" />
+        </div>
+        <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
+          <div>
+            <p className="text-sm text-gray-500">Budget Remaining</p>
+            <p className={`text-2xl font-bold ${budgetRemaining < 0 ? 'text-red-500' : ''}`}>
+              ${budgetRemaining.toFixed(2)}
+            </p>
+            {monthlyBudget > 0 && (
+              <p className="text-xs text-gray-400 mt-0.5">of ${monthlyBudget.toLocaleString()}</p>
+            )}
+          </div>
+          <Wallet className={`p-2 h-10 w-10 rounded-full text-primary-foreground flex-shrink-0 ${budgetRemaining < 0 ? 'bg-red-500' : 'bg-primary'}`} />
         </div>
       </div>
 

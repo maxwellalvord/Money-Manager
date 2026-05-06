@@ -9,12 +9,15 @@ import BudgetCalendar from './_components/BudgetCalendar'
 import { getBudgetsWithSpend } from '@/app/actions/budgets'
 import { getSettings } from '@/app/actions/settings'
 import { getAllExpenses } from '@/app/actions/expenses'
+import MonthlyStatement from './_components/MonthlyStatement'
+import { getLatestStatement } from '@/app/actions/statements'
 
 function Dash() {
   const [budgetList, setBudgetList] = useState([]);
   const [expensesList, setExpensesList] = useState([]);
   const [monthlyBudget, setMonthlyBudget] = useState(0);
   const [budgetEndDay, setBudgetEndDay] = useState(null);
+  const [statement, setStatement] = useState(null);
   const [loading, setLoading] = useState(true);
   const { isLoaded, user } = useUser();
 
@@ -27,13 +30,15 @@ function Dash() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const [budgets, settings, expenses] = await Promise.all([
+      const [budgets, settings, expenses, latestStatement] = await Promise.all([
         getBudgetsWithSpend(),
         getSettings(),
         getAllExpenses(),
+        getLatestStatement(),
       ]);
       setBudgetList(budgets);
       setExpensesList(expenses);
+      setStatement(latestStatement);
       if (settings.length > 0) {
         setMonthlyBudget(Number(settings[0].monthlyBudget));
         setBudgetEndDay(settings[0].budgetEndDay ?? null);
@@ -63,9 +68,10 @@ function Dash() {
             expensesList={expensesList}
             refreshData={loadData}
           />
+          <MonthlyStatement statement={statement} />
         </div>
         <div className='grid gap-4'>
-          <BudgetCalendar budgetEndDay={budgetEndDay} />
+          <BudgetCalendar budgetEndDay={budgetEndDay} budgetList={budgetList} />
           <h2 className='font-bold text-lg'>Latest Budgets</h2>
           {budgetList.map((budget, i) => (
             <BudgetItem budget={budget} key={i} />

@@ -23,18 +23,20 @@ function EditBudget({ budgetInfo, refreshData }) {
   const [openEmojiPicker, setOpenEmojiPicker] = useState(false);
   const [name, setName] = useState();
   const [amount, setAmount] = useState();
+  const [dueDate, setDueDate] = useState("");
 
   useEffect(() => {
     if (budgetInfo) {
       setName(budgetInfo.name ?? "");
       setAmount(budgetInfo.amount ?? "");
       setEmojiIcon(budgetInfo.icon ?? "😀");
+      setDueDate(budgetInfo.dueDate ?? "");
     }
   }, [budgetInfo]);
 
   const onUpdateBudget = async () => {
     try {
-      const res = await updateBudget(budgetInfo.id, { name, amount, icon: emojiIcon });
+      const res = await updateBudget(budgetInfo.id, { name, amount, icon: emojiIcon, dueDate });
       if (res) {
         refreshData();
         toast.success("Budget edited successfully!");
@@ -74,6 +76,11 @@ function EditBudget({ budgetInfo, refreshData }) {
                   <h2 className='text-foreground font-medium my-1'>Budget Amount</h2>
                   <Input placeholder='e.g. $500' type='number' value={amount}
                     onChange={(e) => setAmount(e.target.value)} />
+                </div>
+                <div className='mt-2'>
+                  <h2 className='text-foreground font-medium my-1'>Due Date <span className='text-muted-foreground font-normal'>(optional)</span></h2>
+                  <Input type='date' value={dueDate}
+                    onChange={(e) => setDueDate(e.target.value)} />
                 </div>
               </div>
             </DialogDescription>

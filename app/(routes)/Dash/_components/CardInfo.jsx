@@ -14,6 +14,7 @@ function CardInfo({ budgetList, monthlyBudget, loading }) {
         let allocated = 0;
         let spend = 0;
         budgetList.forEach((i) => {
+            if (i.isSavings) return;
             allocated = allocated + Number(i.amount);
             spend = spend + i.totalSpend;
         })

@@ -64,6 +64,7 @@ function EditMonthlyBudget() {
       await updateSettings({
         monthlyBudget: amount,
         ...(endDay && { budgetEndDay: endDay }),
+        budgetPeriodStart: new Date().toISOString(),
       });
       toast.success("Monthly budget updated!");
     } catch {
