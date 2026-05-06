@@ -111,10 +111,12 @@ function SetMonthlyBudget({ open, onSet }) {
                 Budget period ends on day <span className="font-bold text-foreground">{endDay}</span> each month.
               </p>
             )}
-            <div className="flex gap-2 mt-4">
-              <Button variant="outline" onClick={() => setStep(1)} className="w-full">Back</Button>
+            <div className="mt-4 space-y-2">
               <Button disabled={!endDay} onClick={onSave} className="w-full">
                 Set Budget
+              </Button>
+              <Button variant="outline" onClick={() => setStep(1)} className="w-full">
+                Back
               </Button>
             </div>
           </>

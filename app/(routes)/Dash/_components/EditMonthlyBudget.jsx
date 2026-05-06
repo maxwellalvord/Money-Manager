@@ -108,17 +108,17 @@ function EditMonthlyBudget() {
             )}
           </div>
         </div>
-        <DialogFooter className="sm:justify-start">
+        <div className="mt-4">
           <DialogClose asChild>
             <Button
               disabled={!amount || Number(amount) <= 0}
               onClick={onSave}
-              className="mt-4 w-full"
+              className="w-full"
             >
               Save
             </Button>
           </DialogClose>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   )
