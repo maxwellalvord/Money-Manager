@@ -116,42 +116,39 @@ export async function triggerMonthEnd() {
     expenses: expensesByBudget[b.id] || [],
   }))
 
-  // Run all mutations atomically
-  await db.transaction(async (tx) => {
-    // Create or update savings budget
-    if (!savings) {
-      const [created] = await tx.insert(Budgets)
-        .values({ name: 'Savings', amount: String(totalLeftover), icon: '💰', createdBy: email, isSavings: 1 })
-        .returning()
-      savings = created
-    } else if (totalLeftover > 0) {
-      const newAmount = Number(savings.amount) + totalLeftover
-      await tx.update(Budgets)
-        .set({ amount: String(newAmount) })
-        .where(eq(Budgets.id, savings.id))
-    }
+  // Create or update savings budget
+  if (!savings) {
+    const [created] = await db.insert(Budgets)
+      .values({ name: 'Savings', amount: String(totalLeftover), icon: '💰', createdBy: email, isSavings: 1 })
+      .returning()
+    savings = created
+  } else if (totalLeftover > 0) {
+    const newAmount = Number(savings.amount) + totalLeftover
+    await db.update(Budgets)
+      .set({ amount: String(newAmount) })
+      .where(eq(Budgets.id, savings.id))
+  }
 
-    // Snapshot the statement
-    await tx.insert(MonthlyStatements).values({
-      email,
-      periodLabel,
-      periodEnd: now.toISOString(),
-      monthlyBudget: String(monthlyBudget),
-      totalSpent: String(totalSpent),
-      savedAmount: String(totalLeftover),
-      budgetBreakdown: JSON.stringify(budgetBreakdown),
-    })
-
-    // Clear expenses from regular budgets
-    if (regularBudgetIds.length > 0) {
-      await tx.delete(Expenses).where(inArray(Expenses.budgetId, regularBudgetIds))
-    }
-
-    // Reset budget period start
-    await tx.update(UserSettings)
-      .set({ budgetPeriodStart: now.toISOString() })
-      .where(eq(UserSettings.email, email))
+  // Snapshot the statement
+  await db.insert(MonthlyStatements).values({
+    email,
+    periodLabel,
+    periodEnd: now.toISOString(),
+    monthlyBudget: String(monthlyBudget),
+    totalSpent: String(totalSpent),
+    savedAmount: String(totalLeftover),
+    budgetBreakdown: JSON.stringify(budgetBreakdown),
   })
+
+  // Clear expenses from regular budgets
+  if (regularBudgetIds.length > 0) {
+    await db.delete(Expenses).where(inArray(Expenses.budgetId, regularBudgetIds))
+  }
+
+  // Reset budget period start
+  await db.update(UserSettings)
+    .set({ budgetPeriodStart: now.toISOString() })
+    .where(eq(UserSettings.email, email))
 
   return { savedAmount: totalLeftover, savingsBudgetId: savings.id }
 }
