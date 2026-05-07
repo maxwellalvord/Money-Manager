@@ -1,48 +1,51 @@
 "use client"
-import { Button } from '@/components/ui/button'
 import Image from 'next/image'
 import React from 'react'
 import { useUser, UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
-
+import { ArrowRight } from 'lucide-react'
 
 function Header() {
-  const { isSignedIn, isLoaded } = useUser();
+  const { isSignedIn } = useUser();
 
   return (
-    <div className='p-5 flex justify-between items-center'>
-      <div className="rounded-full overflow-hidden">
-        <Image
-          src={'./logo.svg'}
-          alt="logo"
-          width={160}
-          height={100}
-          className="object-cover"
-        />
+    <header className="sticky top-0 z-50 flex justify-between items-center px-6 py-4 backdrop-blur-md bg-background/80 border-b border-border/50 shadow-sm">
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg overflow-hidden bg-white flex items-center justify-center shadow-sm">
+          <Image
+            src="/logo.svg"
+            alt="logo"
+            width={32}
+            height={32}
+            className="object-contain"
+          />
+        </div>
+        <span className="text-xl font-extrabold tracking-tight text-foreground">
+          Money<span className="font-light text-muted-foreground">Manager</span>
+        </span>
       </div>
-
-      <p className="text-3xl font-extrabold text-foreground tracking-tight uppercase leading-none flex items-end gap-1">
-        <span className="font-extrabold">Money</span>
-        <span className="font-light tracking-widest text-foreground">Manager</span>
-      </p>
 
       {isSignedIn ? (
         <div className="flex items-center gap-3">
-          <Button asChild>
-            <Link href="/Dash">
-              Start Tracking!
-            </Link>
-          </Button>
+          <Link
+            href="/Dash"
+            className="group inline-flex items-center gap-1.5 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-150 shadow-sm shadow-indigo-600/30"
+          >
+            Dashboard
+            <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+          </Link>
           <UserButton />
         </div>
       ) : (
-        <Button asChild>
-          <Link href="/sign-in">
-            Start Tracking!
-          </Link>
-        </Button>
+        <Link
+          href="/sign-in"
+          className="group inline-flex items-center gap-1.5 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-150 shadow-sm shadow-indigo-600/30"
+        >
+          Start Tracking
+          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+        </Link>
       )}
-    </div>
+    </header>
   )
 }
 
