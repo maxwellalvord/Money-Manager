@@ -27,6 +27,7 @@ export const UserSettings = pgTable("user_settings", {
     monthlyBudget: numeric('monthlyBudget').notNull(),
     budgetEndDay: integer('budgetEndDay'),
     budgetPeriodStart: varchar('budgetPeriodStart'),
+    savingsGoal: numeric('savingsGoal'),
 })
 
 export const MonthlyStatements = pgTable("monthly_statements", {

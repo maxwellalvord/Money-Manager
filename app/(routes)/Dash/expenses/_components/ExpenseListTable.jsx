@@ -1,20 +1,32 @@
 import { Trash } from 'lucide-react'
-import React from 'react'
+import React, { useState } from 'react'
 import { toast } from 'sonner';
 import { deleteExpense } from '@/app/actions/expenses'
+import DeleteExpenseDialog from './DeleteExpenseDialog'
 
 function ExpenseListTable({ expensesList, refreshData }) {
+    const [pendingDelete, setPendingDelete] = useState(null)
 
-    const onDelete = async (expense) => {
+    const handleDeleteClick = (expense) => {
+        setPendingDelete(expense)
+    }
+
+    const handleConfirm = async () => {
         try {
-            const res = await deleteExpense(expense.id);
+            const res = await deleteExpense(pendingDelete.id);
             if (res) {
                 toast('Expense Deleted Successfully!');
                 refreshData();
             }
         } catch {
             toast.error('Failed to delete expense.');
+        } finally {
+            setPendingDelete(null)
         }
+    }
+
+    const handleCancel = () => {
+        setPendingDelete(null)
     }
 
     return (
@@ -35,12 +47,18 @@ function ExpenseListTable({ expensesList, refreshData }) {
                         <h2 className='hidden sm:block'>{date ? date.toDateString() : '-'}</h2>
                         <h2>
                             <Trash className='text-red-600 cursor-pointer ml-2.75'
-                                onClick={() => onDelete(expenses)}
+                                onClick={() => handleDeleteClick(expenses)}
                             />
                         </h2>
                     </div>
                 )
             })}
+
+            <DeleteExpenseDialog
+                open={!!pendingDelete}
+                onConfirm={handleConfirm}
+                onCancel={handleCancel}
+            />
         </div>
     )
 }

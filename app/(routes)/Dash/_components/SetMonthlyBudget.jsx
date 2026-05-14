@@ -39,17 +39,22 @@ function SetMonthlyBudget({ open, onSet }) {
   const [step, setStep] = useState(1);
   const [amount, setAmount] = useState("");
   const [endDay, setEndDay] = useState(null);
+  const [savingsGoal, setSavingsGoal] = useState("");
 
-  const onSave = async () => {
+  const onSave = async (goalAmount) => {
     const parsed = Number(amount);
     if (!parsed || parsed <= 0 || !endDay) return;
 
     try {
-      const result = await createSettings({
+      const payload = {
         monthlyBudget: amount,
         budgetEndDay: endDay,
         budgetPeriodStart: new Date().toISOString(),
-      });
+      };
+      if (goalAmount && Number(goalAmount) > 0) {
+        payload.savingsGoal = goalAmount;
+      }
+      const result = await createSettings(payload);
       if (result) {
         toast.success("Monthly budget set!");
         onSet(parsed);
@@ -66,13 +71,17 @@ function SetMonthlyBudget({ open, onSet }) {
           <div className="flex items-center gap-3 mb-1">
             <PiggyBank className="bg-primary p-2 h-10 w-10 rounded-full text-white flex-shrink-0" />
             <DialogTitle className="text-xl">
-              {step === 1 ? 'Set Your Monthly Budget' : 'Choose Your Budget End Day'}
+              {step === 1 ? 'Set Your Monthly Budget'
+                : step === 2 ? 'Choose Your Budget End Day'
+                : 'Set a Savings Goal'}
             </DialogTitle>
           </div>
           <DialogDescription>
             {step === 1
               ? "Enter your total monthly budget. Individual budgets come out of this amount."
-              : "Pick the day of the month your budget period ends. The day after, you'll be prompted to start fresh."
+              : step === 2
+              ? "Pick the day of the month your budget period ends. The day after, you'll be prompted to start fresh."
+              : "Optionally set a savings target. This will appear as a goal card on your savings page."
             }
           </DialogDescription>
         </DialogHeader>
@@ -112,10 +121,37 @@ function SetMonthlyBudget({ open, onSet }) {
               </p>
             )}
             <div className="mt-4 space-y-2">
-              <Button disabled={!endDay} onClick={onSave} className="w-full">
-                Set Budget
+              <Button disabled={!endDay} onClick={() => setStep(3)} className="w-full flex gap-2">
+                Next <ChevronRight className="h-4 w-4" />
               </Button>
               <Button variant="outline" onClick={() => setStep(1)} className="w-full">
+                Back
+              </Button>
+            </div>
+          </>
+        )}
+
+        {step === 3 && (
+          <>
+            <div className="mt-2">
+              <h2 className="font-medium mb-1 text-sm">Savings Goal Amount ($) <span className="text-muted-foreground font-normal">(optional)</span></h2>
+              <Input
+                placeholder="e.g. 10000"
+                type="number"
+                min="1"
+                value={savingsGoal}
+                onChange={(e) => setSavingsGoal(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && onSave(savingsGoal)}
+              />
+            </div>
+            <div className="mt-4 space-y-2">
+              <Button
+                onClick={() => onSave(savingsGoal)}
+                className="w-full"
+              >
+                {savingsGoal && Number(savingsGoal) > 0 ? 'Set Budget & Goal' : 'Set Budget'}
+              </Button>
+              <Button variant="outline" onClick={() => setStep(2)} className="w-full">
                 Back
               </Button>
             </div>

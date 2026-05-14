@@ -3,8 +3,9 @@ import React, { useEffect, useState } from 'react'
 import CreateBudget from './CreateBudget'
 import { useUser } from '@clerk/nextjs'
 import BudgetItem from './BudgetItem'
-import { getBudgetsWithSpend } from '@/app/actions/budgets'
+import { getBudgetsWithSpend, deleteBudgetWithExpenses } from '@/app/actions/budgets'
 import { getSettings } from '@/app/actions/settings'
+import { toast } from 'sonner'
 
 function BudgetList() {
   const [budgetList, setBudgetList] = useState([]);
@@ -76,7 +77,15 @@ function BudgetList() {
               <div key={i} className='bg-slate-100 p-5 rounded-lg animate-pulse h-[145px]' />
             ))
           : budgetList.map((budget) => (
-              <BudgetItem key={budget.id} budget={budget} />
+              <BudgetItem
+                key={budget.id}
+                budget={budget}
+                onDelete={async (id) => {
+                  await deleteBudgetWithExpenses(id)
+                  toast('Budget deleted.')
+                  fetchData()
+                }}
+              />
             ))
         }
       </div>
