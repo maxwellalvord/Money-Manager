@@ -13,6 +13,8 @@ import { useRouter } from 'next/navigation'
 import EditBudget from '../_components/EditBudget'
 import { getBudgetById, deleteBudgetWithExpenses } from '@/app/actions/budgets'
 import { getExpensesByBudget } from '@/app/actions/expenses'
+import { getSettings } from '@/app/actions/settings'
+import SavingsGoalCard from '../_components/SavingsGoalCard'
 
 import {
   AlertDialog,
@@ -31,6 +33,7 @@ function ExpensesScreen({ params }) {
   const { isLoaded, user } = useUser();
   const [budgetInfo, setbudgetInfo] = useState();
   const [expensesList, setExpensesList] = useState([]);
+  const [savingsGoal, setSavingsGoal] = useState(null);
   const route = useRouter();
 
   useEffect(() => {
@@ -41,12 +44,14 @@ function ExpensesScreen({ params }) {
 
   const getBudgetInfo = async () => {
     try {
-      const [budget, expenses] = await Promise.all([
+      const [budget, expenses, settings] = await Promise.all([
         getBudgetById(id),
         getExpensesByBudget(id),
+        getSettings(),
       ]);
       setbudgetInfo(budget);
       setExpensesList(expenses);
+      setSavingsGoal(settings?.[0]?.savingsGoal ?? null);
     } catch (err) {
       console.error('Failed to load budget:', err);
     }
@@ -99,6 +104,14 @@ function ExpensesScreen({ params }) {
             ? <BudgetItem budget={budgetInfo} />
             : <div className='h-[150px] w-full bg-slate-200 rounded-lg animate-pulse' />
           }
+          <SavingsGoalCard
+            savingsGoal={savingsGoal}
+            currentSavings={budgetInfo?.amount}
+            onRefresh={getBudgetInfo}
+          />
+        </div>
+
+        <div className='mt-5'>
           <SavingsTransfer
             savingsBudgetId={Number(id)}
             savingsRemaining={savingsRemaining}
