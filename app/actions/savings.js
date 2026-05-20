@@ -4,6 +4,7 @@ import { db } from '@/utils/dbConfig'
 import { Budgets, Expenses, MonthlyStatements, UserSettings } from '@/utils/schema'
 import { and, eq, getTableColumns, inArray, isNull, or, sql } from 'drizzle-orm'
 import { getSettings } from './settings'
+import { resetRecurringForNewPeriod, applyDueRecurring } from './recurring'
 
 async function getEmail() {
   const user = await currentUser()
@@ -22,15 +23,43 @@ function validateAmount(amount) {
 
 export async function getOrCreateSavingsBudget() {
   const email = await getEmail()
+
+  // Prefer the designated default savings budget
   const existing = await db.select()
+    .from(Budgets)
+    .where(and(eq(Budgets.createdBy, email), eq(Budgets.isDefaultSavings, 1)))
+    .limit(1)
+  if (existing.length > 0) return existing[0]
+
+  // Migrate: if any savings budget exists without the flag, promote the first one
+  const anySavings = await db.select()
     .from(Budgets)
     .where(and(eq(Budgets.createdBy, email), eq(Budgets.isSavings, 1)))
     .limit(1)
-
-  if (existing.length > 0) return existing[0]
+  if (anySavings.length > 0) {
+    await db.update(Budgets).set({ isDefaultSavings: 1 }).where(eq(Budgets.id, anySavings[0].id))
+    return { ...anySavings[0], isDefaultSavings: 1 }
+  }
 
   const [created] = await db.insert(Budgets)
-    .values({ name: 'Savings', amount: '0', icon: '💰', createdBy: email, isSavings: 1 })
+    .values({ name: 'Savings', amount: '0', icon: '💰', createdBy: email, isSavings: 1, isDefaultSavings: 1 })
+    .returning()
+  return created
+}
+
+export async function createSavingsBudget({ name, icon = '🏦', savingsGoal }) {
+  const email = await getEmail()
+  if (!name?.trim()) throw new Error('Name is required')
+  const [created] = await db.insert(Budgets)
+    .values({
+      name: name.trim(),
+      amount: '0',
+      icon,
+      createdBy: email,
+      isSavings: 1,
+      isDefaultSavings: 0,
+      savingsGoal: savingsGoal ? String(savingsGoal) : null,
+    })
     .returning()
   return created
 }
@@ -52,7 +81,7 @@ export async function triggerMonthEnd() {
     getSettings(),
     db.select({
       ...getTableColumns(Budgets),
-      totalSpend: sql`coalesce(sum(${Expenses.amount}), 0)`.mapWith(Number),
+      totalSpend: sql`coalesce(sum(case when ${Expenses.isOverride} != 2 then ${Expenses.amount} else 0 end), 0)`.mapWith(Number),
     }).from(Budgets)
       .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
       .where(eq(Budgets.createdBy, email))
@@ -116,10 +145,17 @@ export async function triggerMonthEnd() {
     expenses: expensesByBudget[b.id] || [],
   }))
 
+  // Use designated default savings, falling back to any savings budget
+  let defaultSavings = budgets.find(b => b.isDefaultSavings === 1) || budgets.find(b => b.isSavings)
+  if (defaultSavings && !defaultSavings.isDefaultSavings) {
+    await db.update(Budgets).set({ isDefaultSavings: 1 }).where(eq(Budgets.id, defaultSavings.id))
+  }
+  savings = defaultSavings
+
   // Create or update savings budget
   if (!savings) {
     const [created] = await db.insert(Budgets)
-      .values({ name: 'Savings', amount: String(totalLeftover), icon: '💰', createdBy: email, isSavings: 1 })
+      .values({ name: 'Savings', amount: String(totalLeftover), icon: '💰', createdBy: email, isSavings: 1, isDefaultSavings: 1 })
       .returning()
     savings = created
   } else if (totalLeftover > 0) {
@@ -150,6 +186,10 @@ export async function triggerMonthEnd() {
     .set({ budgetPeriodStart: now.toISOString() })
     .where(eq(UserSettings.email, email))
 
+  // Reset recurring lastAppliedAt so they re-fire in the new period, then apply any due today
+  await resetRecurringForNewPeriod(email)
+  await applyDueRecurring()
+
   return { savedAmount: totalLeftover, savingsBudgetId: savings.id }
 }
 
@@ -176,15 +216,26 @@ export async function transferFromSavings({ savingsBudgetId, targetBudgetId, amo
     .where(and(eq(Budgets.id, Number(targetBudgetId)), eq(Budgets.createdBy, email)))
   if (!target) throw new Error('Target budget not found')
 
+  const now = new Date().toISOString()
+
   await db.insert(Expenses).values({
     name: `Transfer → ${targetBudgetName}`,
     amount: String(transferAmount),
     budgetId: Number(savingsBudgetId),
     createdBy: email,
-    createdAt: new Date().toISOString(),
+    createdAt: now,
   })
 
   await db.update(Budgets)
     .set({ amount: String(Number(target.amount) + transferAmount) })
     .where(eq(Budgets.id, Number(targetBudgetId)))
+
+  await db.insert(Expenses).values({
+    name: `💰 From Savings`,
+    amount: String(transferAmount),
+    budgetId: Number(targetBudgetId),
+    createdBy: email,
+    createdAt: now,
+    isOverride: 2,
+  })
 }

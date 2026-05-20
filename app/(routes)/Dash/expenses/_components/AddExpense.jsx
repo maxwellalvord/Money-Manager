@@ -68,6 +68,7 @@ function AddExpense({ budget, budgetId, refreshData }) {
                 <Input placeholder='e.g. Record Store'
                     value={name || ''}
                     onChange={(e) => setName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && !isDisabled && !loading && addNewExpense()}
                 />
             </div>
             <div className='mt-2'>
@@ -75,6 +76,7 @@ function AddExpense({ budget, budgetId, refreshData }) {
                 <Input placeholder='e.g. 65'
                     value={amount || ''}
                     onChange={handleAmountChange}
+                    onKeyDown={(e) => e.key === 'Enter' && !isDisabled && !loading && addNewExpense()}
                 />
                 {showOverrideOption && (
                     <div className='mt-2 space-y-2'>

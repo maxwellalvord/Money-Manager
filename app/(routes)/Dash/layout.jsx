@@ -96,7 +96,7 @@ function Dashlayout({ children }) {
         <DashboardHeader
           onMenuToggle={() => setMobileNavOpen(prev => !prev)}
           onForceMonthEnd={() => setShowPeriodEndPrompt(true)}
-          hasSettings={!!currentSettings}
+          hasSettings={isLoaded && !!user && !showBudgetSetup}
         />
         {children}
       </div>

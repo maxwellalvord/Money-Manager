@@ -11,6 +11,7 @@ import { getSettings } from '@/app/actions/settings'
 import { getAllExpenses } from '@/app/actions/expenses'
 import MonthlyStatement from './_components/MonthlyStatement'
 import { getLatestStatement } from '@/app/actions/statements'
+import { applyDueRecurring } from '@/app/actions/recurring'
 
 function Dash() {
   const [budgetList, setBudgetList] = useState([]);
@@ -30,6 +31,7 @@ function Dash() {
   const loadData = async () => {
     setLoading(true);
     try {
+      await applyDueRecurring();
       const [budgets, settings, expenses, latestStatement] = await Promise.all([
         getBudgetsWithSpend(),
         getSettings(),
@@ -72,7 +74,10 @@ function Dash() {
         </div>
         <div className='grid gap-4'>
           <BudgetCalendar budgetEndDay={budgetEndDay} budgetList={budgetList} />
-          <h2 className='font-bold text-lg'>Latest Budgets</h2>
+          <div>
+            <p className='text-xs font-bold uppercase tracking-[0.18em] text-indigo-500 mb-0.5'>Breakdown</p>
+            <h2 className='font-extrabold text-lg bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent'>Latest Budgets</h2>
+          </div>
           {budgetList.map((budget, i) => (
             <BudgetItem budget={budget} key={i} />
           ))}

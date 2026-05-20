@@ -30,7 +30,7 @@ function DashboardHeader({ onMenuToggle, onForceMonthEnd, hasSettings }) {
             onClick={onForceMonthEnd}
           >
             <CalendarX className="h-4 w-4" />
-            <span className="hidden sm:inline">End Month</span>
+            <span className="hidden sm:inline">Force End Budget Period</span>
           </Button>
         )}
         <EditMonthlyBudget />

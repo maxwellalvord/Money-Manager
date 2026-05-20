@@ -7,14 +7,15 @@ import SavingsTransfer from '../_components/SavingsTransfer'
 import SavingsHistory from '../_components/SavingsHistory'
 import ExpenseListTable from '../_components/ExpenseListTable'
 import { Button } from '@/components/ui/button'
-import { Trash } from 'lucide-react'
+import { Plus, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 import { useRouter } from 'next/navigation'
 import EditBudget from '../_components/EditBudget'
 import { getBudgetById, deleteBudgetWithExpenses } from '@/app/actions/budgets'
 import { getExpensesByBudget } from '@/app/actions/expenses'
-import { getSettings } from '@/app/actions/settings'
 import SavingsGoalCard from '../_components/SavingsGoalCard'
+import RecurringExpenseSection from '../_components/RecurringExpenseSection'
+import CreateSavingsDialog from '../_components/CreateSavingsDialog'
 
 import {
   AlertDialog,
@@ -33,7 +34,8 @@ function ExpensesScreen({ params }) {
   const { isLoaded, user } = useUser();
   const [budgetInfo, setbudgetInfo] = useState();
   const [expensesList, setExpensesList] = useState([]);
-  const [savingsGoal, setSavingsGoal] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [createSavingsOpen, setCreateSavingsOpen] = useState(false);
   const route = useRouter();
 
   useEffect(() => {
@@ -44,16 +46,16 @@ function ExpensesScreen({ params }) {
 
   const getBudgetInfo = async () => {
     try {
-      const [budget, expenses, settings] = await Promise.all([
+      const [budget, expenses] = await Promise.all([
         getBudgetById(id),
         getExpensesByBudget(id),
-        getSettings(),
       ]);
       setbudgetInfo(budget);
       setExpensesList(expenses);
-      setSavingsGoal(settings?.[0]?.savingsGoal ?? null);
     } catch (err) {
       console.error('Failed to load budget:', err);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -67,6 +69,20 @@ function ExpensesScreen({ params }) {
     }
   }
 
+  if (loading) {
+    return (
+      <div className='p-8'>
+        <div className='h-9 w-48 bg-slate-200 dark:bg-slate-700 rounded-lg animate-pulse mb-8' />
+        <div className='grid grid-cols-1 md:grid-cols-2 mt-5 gap-5'>
+          <div className='h-[170px] w-full border border-slate-200 dark:border-slate-700 rounded-lg animate-pulse bg-slate-100 dark:bg-slate-800' />
+          <div className='h-[170px] w-full border border-slate-200 dark:border-slate-700 rounded-lg animate-pulse bg-slate-100 dark:bg-slate-800' />
+        </div>
+        <div className='mt-5 h-[120px] w-full border border-slate-200 dark:border-slate-700 rounded-lg animate-pulse bg-slate-100 dark:bg-slate-800' />
+        <div className='mt-8 h-[200px] w-full border border-slate-200 dark:border-slate-700 rounded-lg animate-pulse bg-slate-100 dark:bg-slate-800' />
+      </div>
+    )
+  }
+
   const isSavings = budgetInfo?.isSavings === 1
   const savingsRemaining = budgetInfo
     ? Math.max(0, Number(budgetInfo.amount) - Number(budgetInfo.totalSpend || 0))
@@ -77,9 +93,13 @@ function ExpensesScreen({ params }) {
       <div className='p-8'>
         <h2 className='text-3xl font-bold flex justify-between items-center'>
           <div className='flex items-center gap-3'>
-            <span className='text-4xl'>💰</span>
-            Savings
+            <span className='text-4xl'>{budgetInfo?.icon ?? '💰'}</span>
+            {budgetInfo?.name ?? 'Savings'}
           </div>
+          <div className='flex items-center gap-2'>
+            <Button variant='outline' size='sm' className='flex items-center gap-1.5' onClick={() => setCreateSavingsOpen(true)}>
+              <Plus className='h-4 w-4' /> New Savings Account
+            </Button>
           <AlertDialog>
             <AlertDialogTrigger asChild>
               <Button className='flex gap-2' variant="destructive"><Trash /> Delete</Button>
@@ -97,6 +117,7 @@ function ExpensesScreen({ params }) {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          </div>
         </h2>
 
         <div className='grid grid-cols-1 md:grid-cols-2 mt-5 gap-5'>
@@ -104,11 +125,7 @@ function ExpensesScreen({ params }) {
             ? <BudgetItem budget={budgetInfo} />
             : <div className='h-[150px] w-full bg-slate-200 rounded-lg animate-pulse' />
           }
-          <SavingsGoalCard
-            savingsGoal={savingsGoal}
-            currentSavings={budgetInfo?.amount}
-            onRefresh={getBudgetInfo}
-          />
+          <SavingsGoalCard budget={budgetInfo} onRefresh={getBudgetInfo} />
         </div>
 
         <div className='mt-5'>
@@ -122,6 +139,12 @@ function ExpensesScreen({ params }) {
         <div className='mt-8'>
           <SavingsHistory expensesList={expensesList} refreshData={getBudgetInfo} />
         </div>
+
+        <CreateSavingsDialog
+          open={createSavingsOpen}
+          onOpenChange={setCreateSavingsOpen}
+          onCreated={(budget) => route.push(`/Dash/expenses/${budget.id}`)}
+        />
       </div>
     )
   }
@@ -165,6 +188,10 @@ function ExpensesScreen({ params }) {
           refreshData={getBudgetInfo}
         />
       </div>
+      <div className='mt-5'>
+        <RecurringExpenseSection budgetId={id} />
+      </div>
+
       <div className='mt-8'>
         <ExpenseListTable expensesList={expensesList} refreshData={getBudgetInfo} />
       </div>

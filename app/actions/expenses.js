@@ -46,7 +46,7 @@ export async function getBudgetsWithSpendForExpenses() {
   const email = await getEmail()
   return db.select({
     ...getTableColumns(Budgets),
-    totalSpend: sql`coalesce(sum(${Expenses.amount}), 0)`.mapWith(Number),
+    totalSpend: sql`coalesce(sum(case when ${Expenses.isOverride} != 2 then ${Expenses.amount} else 0 end), 0)`.mapWith(Number),
   }).from(Budgets)
     .leftJoin(Expenses, eq(Budgets.id, Expenses.budgetId))
     .where(eq(Budgets.createdBy, email))

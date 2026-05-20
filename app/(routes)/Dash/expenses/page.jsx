@@ -1,6 +1,7 @@
 "use client"
 import React, { useState, useEffect, useMemo } from 'react'
 import ExpenseListTable from './_components/ExpenseListTable'
+import QuickAddExpense from './_components/QuickAddExpense'
 import { useUser } from '@clerk/nextjs'
 import { PiggyBank, ReceiptText, TrendingUp, Wallet } from 'lucide-react'
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from 'recharts'
@@ -55,33 +56,34 @@ function Expenses() {
 
   return (
     <div className="p-6 flex flex-col gap-5" style={{ minHeight: 'calc(100vh - 60px)' }}>
-      <div className='flex items-center gap-3'>
-        <h2 className="font-bold text-2xl">My Expenses</h2>
+      <div>
+        <p className='text-xs font-bold uppercase tracking-[0.18em] text-indigo-500 mb-1'>Overview</p>
+        <h2 className="font-extrabold text-3xl bg-gradient-to-r from-indigo-500 to-purple-500 bg-clip-text text-transparent">My Expenses</h2>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
+        <div className="bg-accent rounded-lg p-5 flex items-center justify-between border-t-2 border-indigo-400">
           <div>
             <p className="text-sm text-gray-500">Total Spent</p>
             <p className="text-2xl font-bold">${totalSpent.toFixed(2)}</p>
           </div>
           <PiggyBank className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground flex-shrink-0" />
         </div>
-        <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
+        <div className="bg-accent rounded-lg p-5 flex items-center justify-between border-t-2 border-purple-400">
           <div>
             <p className="text-sm text-gray-500">No. of Expenses</p>
             <p className="text-2xl font-bold">{expensesList.length}</p>
           </div>
           <ReceiptText className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground flex-shrink-0" />
         </div>
-        <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
+        <div className="bg-accent rounded-lg p-5 flex items-center justify-between border-t-2 border-pink-400">
           <div>
             <p className="text-sm text-gray-500">Avg per Expense</p>
             <p className="text-2xl font-bold">${avgExpense}</p>
           </div>
           <TrendingUp className="bg-primary p-2 h-10 w-10 rounded-full text-primary-foreground flex-shrink-0" />
         </div>
-        <div className="bg-accent rounded-lg p-5 flex items-center justify-between">
+        <div className={`bg-accent rounded-lg p-5 flex items-center justify-between border-t-2 ${budgetRemaining < 0 ? 'border-red-400' : 'border-emerald-400'}`}>
           <div>
             <p className="text-sm text-gray-500">Budget Remaining</p>
             <p className={`text-2xl font-bold ${budgetRemaining < 0 ? 'text-red-500' : ''}`}>
@@ -94,6 +96,8 @@ function Expenses() {
           <Wallet className={`p-2 h-10 w-10 rounded-full text-primary-foreground flex-shrink-0 ${budgetRemaining < 0 ? 'bg-red-500' : 'bg-primary'}`} />
         </div>
       </div>
+
+      <QuickAddExpense budgetList={budgetList} refreshData={loadData} />
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1">
         <div className="border rounded-lg p-5 flex flex-col">

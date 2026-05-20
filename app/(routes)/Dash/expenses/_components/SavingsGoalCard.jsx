@@ -11,15 +11,15 @@ import {
     DialogTitle,
     DialogFooter,
 } from '@/components/ui/dialog'
-import { updateSettings } from '@/app/actions/settings'
+import { updateSavingsGoal } from '@/app/actions/budgets'
 import { toast } from 'sonner'
 
-function SavingsGoalCard({ savingsGoal, currentSavings, onRefresh }) {
+function SavingsGoalCard({ budget, onRefresh }) {
     const [editOpen, setEditOpen] = useState(false)
     const [goalInput, setGoalInput] = useState('')
 
-    const goal = Number(savingsGoal) || 0
-    const saved = Number(currentSavings) || 0
+    const goal = Number(budget?.savingsGoal) || 0
+    const saved = Number(budget?.amount) || 0
     const progress = goal > 0 ? Math.min((saved / goal) * 100, 100) : 0
     const remaining = Math.max(0, goal - saved)
 
@@ -32,7 +32,7 @@ function SavingsGoalCard({ savingsGoal, currentSavings, onRefresh }) {
         const parsed = Number(goalInput)
         if (!parsed || parsed <= 0) return
         try {
-            await updateSettings({ savingsGoal: goalInput })
+            await updateSavingsGoal(budget.id, parsed)
             toast.success('Savings goal updated!')
             setEditOpen(false)
             onRefresh()
@@ -43,7 +43,7 @@ function SavingsGoalCard({ savingsGoal, currentSavings, onRefresh }) {
 
     const handleRemove = async () => {
         try {
-            await updateSettings({ savingsGoal: null })
+            await updateSavingsGoal(budget.id, null)
             toast.success('Savings goal removed.')
             setEditOpen(false)
             onRefresh()

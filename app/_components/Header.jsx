@@ -3,7 +3,7 @@ import Image from 'next/image'
 import React from 'react'
 import { useUser, UserButton } from '@clerk/nextjs'
 import Link from 'next/link'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRight, BookOpen } from 'lucide-react'
 
 function Header() {
   const { isSignedIn } = useUser();
@@ -25,26 +25,35 @@ function Header() {
         </span>
       </div>
 
-      {isSignedIn ? (
-        <div className="flex items-center gap-3">
+      <div className="flex items-center gap-3">
+        <Link
+          href="/how-to-use"
+          className="inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
+        >
+          <BookOpen className="w-3.5 h-3.5" />
+          How To Use
+        </Link>
+        {isSignedIn ? (
+          <>
+            <Link
+              href="/Dash"
+              className="group inline-flex items-center gap-1.5 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-150 shadow-sm shadow-indigo-600/30"
+            >
+              Dashboard
+              <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
+            </Link>
+            <UserButton />
+          </>
+        ) : (
           <Link
-            href="/Dash"
+            href="/sign-in"
             className="group inline-flex items-center gap-1.5 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-150 shadow-sm shadow-indigo-600/30"
           >
-            Dashboard
+            Start Tracking
             <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
           </Link>
-          <UserButton />
-        </div>
-      ) : (
-        <Link
-          href="/sign-in"
-          className="group inline-flex items-center gap-1.5 px-5 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold rounded-xl transition-all duration-150 shadow-sm shadow-indigo-600/30"
-        >
-          Start Tracking
-          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5" />
-        </Link>
-      )}
+        )}
+      </div>
     </header>
   )
 }

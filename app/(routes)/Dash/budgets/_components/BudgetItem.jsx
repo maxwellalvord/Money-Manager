@@ -43,6 +43,9 @@ function BudgetItem({ budget, onDelete }) {
                                     {isSavings && (
                                         <span className='text-xs bg-yellow-400 text-yellow-900 font-semibold px-1.5 py-0.5 rounded'>SAVINGS</span>
                                     )}
+                                    {budget?.isDefaultSavings === 1 && (
+                                        <span className='text-xs bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400 font-semibold px-1.5 py-0.5 rounded border border-emerald-300 dark:border-emerald-700'>DEFAULT</span>
+                                    )}
                                 </div>
                                 <h2 className='text-sm text-gray-500'>{budget.totalItem} item(s)</h2>
                             </div>

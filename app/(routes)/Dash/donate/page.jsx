@@ -50,14 +50,14 @@ export default function Page() {
     const isValidTier = tiers.includes(tier);
 
     return (
-        <div className="min-h-screen pb-56 relative overflow-hidden">
+        <div className="min-h-screen flex flex-col relative overflow-hidden">
 
             {/* Decorative background blobs */}
             <div className="pointer-events-none absolute -top-24 -left-24 w-96 h-96 rounded-full bg-blue-400/10 blur-3xl" />
             <div className="pointer-events-none absolute top-1/3 -right-32 w-80 h-80 rounded-full bg-indigo-400/10 blur-3xl" />
             <div className="pointer-events-none absolute bottom-32 left-1/4 w-72 h-72 rounded-full bg-blue-300/10 blur-3xl" />
 
-            <div className="relative w-full px-4 sm:px-6 lg:px-10 py-8">
+            <div className="relative w-full px-4 sm:px-6 lg:px-10 py-8 pb-0">
                 <div className="flex flex-col lg:flex-row gap-6 items-start w-full">
 
                     {/* ── LEFT PANEL (desktop only) ── */}
@@ -309,7 +309,7 @@ export default function Page() {
             </div>
 
             {/* Footer */}
-            <div className="fixed bottom-0 left-0 z-50 w-full md:ml-64 md:w-[calc(100%-256px)] bg-background border-t">
+            <div className="mt-auto w-full bg-background border-t">
                 <div className="flex flex-col items-center justify-center py-3 px-6 gap-2">
                     <div className="flex gap-5 text-2xl">
                         <a href="https://www.linkedin.com/in/maxwellalvord/" className="hover:text-blue-600 transition-colors"><AiFillLinkedin /></a>

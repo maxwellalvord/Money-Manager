@@ -31,8 +31,8 @@ function ExpenseListTable({ expensesList, refreshData }) {
 
     return (
         <div className='mt-2'>
-            <h2 className='font-bold text-lg bg-sidebar-accent'>Latest Expenses</h2>
-            <div className='grid grid-cols-3 sm:grid-cols-4 bg-output p-2 mt-3'>
+            <h2 className='font-bold text-lg bg-sidebar-accent rounded-lg px-2 py-1'>Latest Expenses</h2>
+            <div className='grid grid-cols-3 sm:grid-cols-4 bg-output p-2 mt-3 rounded-t-lg'>
                 <h2 className='font-bold'>Name</h2>
                 <h2 className='font-bold'>Amount</h2>
                 <h2 className='font-bold hidden sm:block'>Date</h2>
@@ -40,10 +40,13 @@ function ExpenseListTable({ expensesList, refreshData }) {
             </div>
             {expensesList.map((expenses, i) => {
                 const date = expenses.createdAt ? new Date(expenses.createdAt) : null;
+                const isSavingsCredit = expenses.isOverride === 2;
                 return (
-                    <div key={expenses.id || i} className='grid grid-cols-3 sm:grid-cols-4 bg-output p-2'>
-                        <h2 className='truncate pr-2'>{expenses.name}</h2>
-                        <h2>${expenses.amount}</h2>
+                    <div key={expenses.id || i} className={`grid grid-cols-3 sm:grid-cols-4 bg-output p-2 ${isSavingsCredit ? 'bg-green-50 dark:bg-green-900/10' : ''}`}>
+                        <h2 className={`truncate pr-2 ${isSavingsCredit ? 'text-green-600 dark:text-green-400 font-medium' : ''}`}>{expenses.name}</h2>
+                        <h2 className={isSavingsCredit ? 'text-green-600 dark:text-green-400 font-semibold' : ''}>
+                            {isSavingsCredit ? '+' : ''}${expenses.amount}
+                        </h2>
                         <h2 className='hidden sm:block'>{date ? date.toDateString() : '-'}</h2>
                         <h2>
                             <Trash className='text-red-600 cursor-pointer ml-2.75'

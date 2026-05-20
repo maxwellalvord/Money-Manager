@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import {
   Dialog,
   DialogContent,
@@ -19,6 +20,7 @@ import { RefreshCw, ArrowRight } from 'lucide-react'
 function BudgetPeriodEndPrompt({ open, currentSettings, onDismiss }) {
   const [mode, setMode] = useState('choose')
   const [newAmount, setNewAmount] = useState(String(currentSettings?.monthlyBudget ?? ''))
+  const router = useRouter()
 
   const onContinueLastMonth = async () => {
     try {
@@ -29,6 +31,7 @@ function BudgetPeriodEndPrompt({ open, currentSettings, onDismiss }) {
         toast.success("Continuing with last month's budget!")
       }
       onDismiss()
+      router.refresh()
     } catch {
       toast.error("Failed to update budget period.")
     }
@@ -50,6 +53,7 @@ function BudgetPeriodEndPrompt({ open, currentSettings, onDismiss }) {
         toast.success("Starting fresh with a new budget!")
       }
       onDismiss()
+      router.refresh()
     } catch {
       toast.error("Failed to start new budget period.")
     }
@@ -99,7 +103,7 @@ function BudgetPeriodEndPrompt({ open, currentSettings, onDismiss }) {
               <div className="flex items-center justify-between w-full gap-3 min-w-0">
                 <div className="text-left min-w-0">
                   <p className="font-semibold">Start Fresh</p>
-                  <p className="text-xs text-white/80 mt-0.5">New amount, clear all budgets for {month}</p>
+                  <p className="text-xs text-primary-foreground/80 mt-0.5">New amount, clear all budgets for {month}</p>
                 </div>
                 <ArrowRight className="h-4 w-4 flex-shrink-0" />
               </div>

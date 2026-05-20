@@ -2,7 +2,7 @@ import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
 
 // Make the root landing page and the sign-in routes public so visitors
 // can access the landing page without being redirected to sign-in.
-const isPublicRoute = createRouteMatcher(['/', '/sign-in(.*)'])
+const isPublicRoute = createRouteMatcher(['/', '/sign-in(.*)', '/how-to-use'])
 
 export default clerkMiddleware(async (auth, req) => {
   if (!isPublicRoute(req)) {

@@ -3,7 +3,7 @@
 'use client'
 
 import Image from 'next/image'
-import { LayoutDashboard, HandCoins, BanknoteArrowDown, HeartHandshake, X } from 'lucide-react'
+import { LayoutDashboard, HandCoins, BanknoteArrowDown, HeartHandshake, BookOpen, X } from 'lucide-react'
 import { UserButton } from '@clerk/nextjs'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
@@ -34,6 +34,12 @@ function SideNav({ onClose }) {
             name: 'Donate',
             icon: HeartHandshake,
             path: "/Dash/donate"
+        },
+        {
+            id: 5,
+            name: 'How To Use',
+            icon: BookOpen,
+            path: "/how-to-use"
         }
     ]
     const path = usePathname();

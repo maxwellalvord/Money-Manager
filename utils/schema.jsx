@@ -7,6 +7,8 @@ export const Budgets=pgTable("budgets",{
     icon:varchar('icon'),
     createdBy:varchar('createdBy').notNull(),
     isSavings:integer('isSavings').default(0),
+    isDefaultSavings:integer('isDefaultSavings').default(0),
+    savingsGoal:varchar('savingsGoal'),
     dueDate:varchar('dueDate'),
     isOverride:integer('isOverride').default(0),
 })
@@ -28,6 +30,16 @@ export const UserSettings = pgTable("user_settings", {
     budgetEndDay: integer('budgetEndDay'),
     budgetPeriodStart: varchar('budgetPeriodStart'),
     savingsGoal: numeric('savingsGoal'),
+})
+
+export const RecurringExpenses = pgTable("recurring_expenses", {
+    id: serial('id').primaryKey(),
+    name: varchar('name').notNull(),
+    amount: numeric('amount').notNull(),
+    budgetId: integer('budgetId').references(() => Budgets.id),
+    createdBy: varchar('createdBy').notNull(),
+    dueDay: integer('dueDay').notNull(),
+    lastAppliedAt: varchar('lastAppliedAt'),
 })
 
 export const MonthlyStatements = pgTable("monthly_statements", {

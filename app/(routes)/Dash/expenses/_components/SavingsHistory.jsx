@@ -1,16 +1,21 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { ArrowRightLeft, Trash } from 'lucide-react'
 import { toast } from 'sonner'
 import { deleteExpense } from '@/app/actions/expenses'
+import DeleteExpenseDialog from './DeleteExpenseDialog'
 
 function SavingsHistory({ expensesList, refreshData }) {
-  const onDelete = async (expense) => {
+  const [pendingDelete, setPendingDelete] = useState(null)
+
+  const handleConfirm = async () => {
     try {
-      await deleteExpense(expense.id)
+      await deleteExpense(pendingDelete.id)
       toast('Transfer record removed.')
       refreshData()
     } catch {
       toast.error('Failed to remove record.')
+    } finally {
+      setPendingDelete(null)
     }
   }
 
@@ -50,13 +55,19 @@ function SavingsHistory({ expensesList, refreshData }) {
                 </span>
                 <Trash
                   className='h-4 w-4 text-red-500 cursor-pointer hover:text-red-700'
-                  onClick={() => onDelete(expense)}
+                  onClick={() => setPendingDelete(expense)}
                 />
               </div>
             )
           })}
         </div>
       )}
+
+      <DeleteExpenseDialog
+        open={!!pendingDelete}
+        onConfirm={handleConfirm}
+        onCancel={() => setPendingDelete(null)}
+      />
     </div>
   )
 }
