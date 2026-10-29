@@ -69,8 +69,13 @@ export async function addExpense({ name, amount, budgetId, createdAt, isOverride
   const email = await getEmail()
   validateName(name)
   validateAmount(amount)
+  const owned = await db.select({ id: Budgets.id })
+    .from(Budgets)
+    .where(and(eq(Budgets.id, Number(budgetId)), eq(Budgets.createdBy, email)))
+  if (!owned.length) throw new Error('Budget not found or unauthorized')
+
   return db.insert(Expenses)
-    .values({ name: name.trim(), amount, budgetId, createdBy: email, createdAt, isOverride })
+    .values({ name: name.trim(), amount, budgetId: Number(budgetId), createdBy: email, createdAt, isOverride })
     .returning({ insertedId: Expenses.id })
 }
 

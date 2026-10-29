@@ -32,11 +32,18 @@ export async function createSettings({ monthlyBudget, budgetEndDay, budgetPeriod
     .returning({ id: UserSettings.id })
 }
 
+const UPDATABLE_FIELDS = ['monthlyBudget', 'budgetEndDay', 'budgetPeriodStart', 'savingsGoal']
+
 export async function updateSettings(fields) {
   const email = await getEmail()
   if (fields.budgetEndDay !== undefined) validateBudgetEndDay(fields.budgetEndDay)
+  // Only copy user-editable columns so callers can't overwrite email or id
+  const updates = Object.fromEntries(
+    UPDATABLE_FIELDS.filter(key => fields[key] !== undefined).map(key => [key, fields[key]])
+  )
+  if (Object.keys(updates).length === 0) throw new Error('No valid fields to update')
   return db.update(UserSettings)
-    .set(fields)
+    .set(updates)
     .where(eq(UserSettings.email, email))
     .returning()
 }
